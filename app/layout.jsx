@@ -1,6 +1,7 @@
 import '../styles/globals.css';
 import Script from 'next/script';
 import RippleInit from '../components/rippleinit';
+import WaterBackground from '../components/waterbackground';
 
 const waterBackgrounds = [
   '/images/water1.jpg',
@@ -24,13 +25,9 @@ export default function RootLayout({ children }) {
       </head>
       <body>
         <RippleInit />
-        <div
-          id="ripple-background"
-          className="w-full min-h-screen bg-cover bg-center"
-          style={{ backgroundImage: `url(${imageURL})` }}
-        >
+        <WaterBackground>
           {children}
-        </div>
+        </WaterBackground>
       </body>
     </html>
   );

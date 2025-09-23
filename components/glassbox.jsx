@@ -2,14 +2,18 @@
 
 import { useState, useRef, useEffect } from 'react';
 
-export function GlassBox({ title, children, initialX = 100, initialY = 100 }) {
+let topZIndex = 1000;
+
+export function GlassBox({ title, icon, headerColor, children, initialX=100, initialY=100 }) {
     const [position, setPosition] = useState({ x: initialX, y: initialY });
     const [isDragging, setIsDragging] = useState(false);
     const dragOffset = useRef({ x: 0, y: 0 });
     const boxRef = useRef(null);
-
+    const [zIndex, setZIndex] = useState(topZIndex);
 
     const handleMouseDown = (e) => {
+    topZIndex += 1;
+    setZIndex(topZIndex);
     setIsDragging(true);
     dragOffset.current = {
         x: e.clientX - position.x,
@@ -58,16 +62,15 @@ export function GlassBox({ title, children, initialX = 100, initialY = 100 }) {
             position: 'absolute',
             left: position.x,
             top: position.y,
-            zIndex: 1000,
+            zIndex: zIndex,
         }}
-        className="max-w-2xl mx-auto rounded-lg bg-gradient-to-b from-white/20 to-white/5 overflow-hidden shadow-2xl backdrop-blur-md bg-white/10 border border-white/30"
+        className="max-w-2xl mx-auto rounded-lg bg-gradient-to-b from-white/20 to-white/5 overflow-hidden shadow-2xl backdrop-blur-md bg-white/10"
         >
-            <div className="glass-header px-3 py-2 cursor-move"
-            onMouseDown={handleMouseDown}
-        >
+            <div className={`flex glass-header px-3 py-2 bg-linear-65 ${headerColor ? headerColor : "from-black"} to-white/5 cursor-grab`} onMouseDown={handleMouseDown}>
+                {(icon != null) && (<img src={icon} className='max-w-5 max-h-5 mr-1'></img>)}
                 <h3 className="text-sm font-semibold text-white">{title}</h3>
             </div>
-            <div className="px-6 py-4 bg-white/20 text-white">
+            <div className="px-6 py-4 bg-white/20 text-black">
                 {children}
             </div>
         </div>
