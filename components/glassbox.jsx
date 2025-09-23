@@ -67,7 +67,7 @@ export function GlassBox({ title, icon, headerColor, children, initialX=100, ini
         className="max-w-2xl mx-auto rounded-lg bg-gradient-to-b from-white/20 to-white/5 overflow-hidden shadow-2xl backdrop-blur-md bg-white/10"
         >
             <div className={`flex glass-header px-3 py-2 bg-linear-65 ${headerColor ? headerColor : "from-black"} to-white/5 cursor-grab`} onMouseDown={handleMouseDown}>
-                {(icon != null) && (<img src={icon} className='max-w-5 max-h-5 mr-1'></img>)}
+                {(icon != null) && (<img src={icon} alt='The icon of the window' className='max-w-5 max-h-5 mr-1'></img>)}
                 <h3 className="text-sm font-semibold text-white">{title}</h3>
             </div>
             <div className="px-6 py-4 bg-white/20 text-black">
