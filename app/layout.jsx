@@ -1,29 +1,40 @@
 import '../styles/globals.css';
-import { Footer } from '../components/footer';
-import { Header } from '../components/header';
 
-export const metadata = {
-    title: {
-        template: '%s | Netlify',
-        default: 'Netlify Starter'
-    }
+
+import Script from 'next/script';
+import RippleInit from '../components/RippleInit';
+
+const waterBackgrounds = [
+  '/images/water1.jpg',
+  '/images/water2.jpg',
+  '/images/water3.jpg',
+];
+
+const getRandomBackground = () => {
+  const randomIndex = Math.floor(Math.random() * waterBackgrounds.length);
+  return waterBackgrounds[randomIndex];
 };
 
 export default function RootLayout({ children }) {
-    return (
-        <html lang="en">
-            <head>
-                <link rel="icon" href="/favicon.svg" sizes="any" />
-            </head>
-            <body className="antialiased text-white bg-blue-900">
-                <div className="flex flex-col min-h-screen px-6 bg-noise sm:px-12">
-                    <div className="flex flex-col w-full max-w-5xl mx-auto grow">
-                        <Header />
-                        <main className="grow">{children}</main>
-                        <Footer />
-                    </div>
-                </div>
-            </body>
-        </html>
-    );
+  const imageURL = getRandomBackground();
+
+  return (
+    <html lang="en">
+      <head>
+        <Script src="https://code.jquery.com/jquery-3.6.0.min.js" strategy="beforeInteractive" />
+        <Script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.ripples/0.5.3/jquery.ripples.min.js" strategy="beforeInteractive" />
+      </head>
+      <body>
+        <RippleInit />
+        <div
+          id="ripple-background"
+          className="w-full min-h-screen bg-cover bg-center"
+          style={{ backgroundImage: `url(${imageURL})` }}
+        >
+          {children}
+        </div>
+      </body>
+    </html>
+  );
 }
+
