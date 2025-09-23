@@ -1,6 +1,4 @@
 import '../styles/globals.css';
-
-
 import Script from 'next/script';
 import RippleInit from '../components/rippleinit';
 
