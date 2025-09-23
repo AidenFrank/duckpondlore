@@ -1,4 +1,5 @@
 import { GlassBox } from 'components/glassbox';
+import About from '/components/glasscontent/about';
 
 export default function Page() {
     return (
