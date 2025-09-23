@@ -23,10 +23,16 @@ export default function WaterBackground({ children }) {
   return (
     <div
       id="ripple-background"
-      className="w-full min-h-screen bg-cover bg-center"
-      style={{ backgroundImage: `url(${imageURL})` }}
+      className="w-full bg-repeat-y bg-center bg-fixed"
+      style={{
+        backgroundImage: `url(${imageURL})`,
+        backgroundSize: '100% auto', // stretch horizontally, repeat vertically
+      }}
     >
-      {children}
+      {/* Optional overlay for subtle fade */}
+      <div className="w-full min-h-screen bg-gradient-to-b from-white/10 to-white/0">
+        {children}
+      </div>
     </div>
   );
 }

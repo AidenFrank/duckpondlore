@@ -4,14 +4,31 @@ import { useState, useRef, useEffect } from 'react';
 
 let topZIndex = 1000;
 
-export function GlassBox({ title, icon, headerColor, children, initialX=100, initialY=100 }) {
+export function GlassBox({ 
+    title, icon, iconW="w-5", iconH="h-5", headerColor, children, initialX=100, initialY=100, order = ''}) {
     const [position, setPosition] = useState({ x: initialX, y: initialY });
     const [isDragging, setIsDragging] = useState(false);
+    const [isSmallScreen, setIsSmallScreen] = useState(false);
+    const [zIndex, setZIndex] = useState(topZIndex);
     const dragOffset = useRef({ x: 0, y: 0 });
     const boxRef = useRef(null);
-    const [zIndex, setZIndex] = useState(topZIndex);
+
+    useEffect(() => {
+        const checkScreenSize = () => {
+            setIsSmallScreen(window.innerWidth < 768); // Tailwind's md breakpoint
+        };
+
+        checkScreenSize(); // Initial check
+        window.addEventListener('resize', checkScreenSize);
+
+        return () => {
+            window.removeEventListener('resize', checkScreenSize);
+        };
+    }, []);
+
 
     const handleMouseDown = (e) => {
+    if (isSmallScreen) return;
     topZIndex += 1;
     setZIndex(topZIndex);
     setIsDragging(true);
@@ -23,6 +40,7 @@ export function GlassBox({ title, icon, headerColor, children, initialX=100, ini
     };
 
     useEffect(() => {
+
     const handleMouseMove = (e) => {
         if (!isDragging) return;
 
@@ -58,16 +76,17 @@ export function GlassBox({ title, icon, headerColor, children, initialX=100, ini
     return (
         <div 
         ref={boxRef}
-        style={{
-            position: 'absolute',
-            left: position.x,
-            top: position.y,
-            zIndex: zIndex,
-        }}
-        className="max-w-2xl mx-auto rounded-lg bg-gradient-to-b from-white/20 to-white/5 overflow-hidden shadow-2xl backdrop-blur-md bg-white/10"
+        style={
+            isSmallScreen
+            ? { position: 'relative', width: '100%', zIndex }
+            : { position: 'absolute', left: position.x, top: position.y, zIndex }
+        }
+        className={`rounded-lg bg-gradient-to-b from-white/20 to-white/5 overflow-hidden shadow-2xl backdrop-blur-md bg-white/10 ${
+            isSmallScreen ? `w-full m-2 ${order}` : 'w-fit'
+        }`}
         >
             <div className={`flex glass-header px-3 py-2 bg-linear-65 ${headerColor ? headerColor : "from-black"} to-white/5 cursor-grab`} onMouseDown={handleMouseDown}>
-                {(icon != null) && (<img src={icon} alt='The icon of the window' className='max-w-5 max-h-5 mr-1'></img>)}
+                {(icon != null) && (<img src={icon} alt='The icon of the window' className={`mr-1 ${iconW} ${iconH} select-none pointer-events-none`}></img>)}
                 <h3 className="text-sm font-semibold text-white">{title}</h3>
             </div>
             <div className="px-6 py-4 bg-white/20 text-black">
