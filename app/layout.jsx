@@ -2,6 +2,7 @@ import '../styles/globals.css';
 import Script from 'next/script';
 import RippleInit from '../components/rippleinit';
 import WaterBackground from '../components/waterbackground';
+import Footer from '/components/footer/footer';
 
 const waterBackgrounds = [
   '/images/water1.jpg',
@@ -28,6 +29,7 @@ export default function RootLayout({ children }) {
         <WaterBackground>
           {children}
         </WaterBackground>
+        <Footer />
       </body>
     </html>
   );

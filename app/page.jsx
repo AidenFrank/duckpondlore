@@ -1,14 +1,14 @@
-import { GlassBox } from 'components/glassbox';
-import About from '/components/glasscontent/about';
+import { GlassBoxProvider } from '../context/GlassBoxContext';
+import GlassBoxManager from '../components/GlassBoxManager';
 
 export default function Page() {
     return (
         <>
-            <div className='flex flex-wrap'>
-                <GlassBox title="Haii!!!" icon="\gifs\smileywave.gif" iconW='w-8' headerColor={"from-green-900"} initialX={20} initialY={20} order="order-1">
-                    <About />
-                </GlassBox>
-            </div>
+            <GlassBoxProvider>
+                <div className='flex flex-wrap'>
+                    <GlassBoxManager boxIds={['about', 'butterdog', 'walkingduck', 'frutigeraero1']}/>
+                </div>
+            </GlassBoxProvider>
         </>
     );
 }

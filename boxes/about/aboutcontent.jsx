@@ -1,4 +1,4 @@
-export default function About() {
+export default function AboutContent() {
   return (
     <>
         <div className="flex flex-col md:flex-row items-center justify-center gap-2 py-2 whitespace-nowrap w-full">

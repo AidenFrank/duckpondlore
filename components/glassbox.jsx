@@ -85,7 +85,7 @@ export function GlassBox({
             isSmallScreen ? `w-full m-2 ${order}` : 'w-fit'
         }`}
         >
-            <div className={`flex glass-header px-3 py-2 bg-linear-65 ${headerColor ? headerColor : "from-black"} to-white/5 cursor-grab`} onMouseDown={handleMouseDown}>
+            <div className={`flex glass-header px-3 py-2 bg-linear-65 ${headerColor ? headerColor : "from-black"} to-white/5 ${isDragging ? 'cursor-grabbing' : 'cursor-grab'}`} onMouseDown={handleMouseDown}>
                 {(icon != null) && (<img src={icon} alt='The icon of the window' className={`mr-1 ${iconW} ${iconH} select-none pointer-events-none`}></img>)}
                 <h3 className="text-sm font-semibold text-white">{title}</h3>
             </div>
