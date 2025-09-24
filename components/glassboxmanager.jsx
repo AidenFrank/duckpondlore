@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { GlassBox } from './GlassBox';
+import { GlassBox } from './glassbox';
 import { allBoxes } from '../boxes/registry.jsx';
 
 export default function GlassBoxManager({ boxIds }) {
