@@ -1,5 +1,5 @@
-import { GlassBoxProvider } from '../context/GlassBoxContext';
-import GlassBoxManager from '../components/GlassBoxManager';
+import { GlassBoxProvider } from '../context/glassboxcontext';
+import GlassBoxManager from '../components/glassboxmanager';
 
 export default function Page() {
     return (
