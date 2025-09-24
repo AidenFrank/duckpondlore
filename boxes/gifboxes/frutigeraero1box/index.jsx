@@ -1,4 +1,4 @@
-import Frutigeraero1Content from './frutigeraero1content.jsx';
+import Frutigeraero1Content from './frutigeraero1content';
 
 const Frutigeraero1Box = {
   id: 'frutigeraero1',

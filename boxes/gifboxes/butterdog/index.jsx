@@ -1,4 +1,4 @@
-import ButterDogContent from './ButterDogContent';
+import ButterDogContent from './butterdogcontent';
 
 const ButterDogBox = {
   id: 'butterdog',
