@@ -5,7 +5,7 @@ import { useState, useRef, useEffect } from 'react';
 let topZIndex = 1000;
 
 export function GlassBox({ 
-    title, icon, iconW="w-5", iconH="h-5", headerColor, children, initialX=100, initialY=100, order = ''}) {
+    title, icon, iconW="w-5", iconH="h-5", headerColor, children, initialX=100, initialY=100, sizeClasses, order = ''}) {
     const [position, setPosition] = useState({ x: initialX, y: initialY });
     const [isDragging, setIsDragging] = useState(false);
     const [isSmallScreen, setIsSmallScreen] = useState(false);
@@ -53,8 +53,13 @@ export function GlassBox({
         let newX = e.clientX - dragOffset.current.x;
         let newY = e.clientY - dragOffset.current.y;
 
-        newX = Math.max(0, Math.min(newX, windowWidth - boxWidth));
-        newY = Math.max(0, Math.min(newY, windowHeight - boxHeight));
+        // Ensure the box stays fully within the viewport
+        const maxX = windowWidth - boxWidth;
+        const maxY = windowHeight - boxHeight;
+
+
+        newX = Math.min(Math.max(0, newX), maxX);
+        newY = Math.min(Math.max(0, newY), maxY);
 
         setPosition({ x: newX, y: newY });
     };
@@ -73,23 +78,60 @@ export function GlassBox({
     };
     }, [isDragging]);
 
+useEffect(() => {
+  const repositionIfViewportShrinks = () => {
+    const box = boxRef.current;
+    if (!box) return;
+
+    const boxWidth = box.offsetWidth;
+    const boxHeight = box.offsetHeight;
+    const windowWidth = window.innerWidth;
+    const windowHeight = window.innerHeight;
+
+    let newX = position.x;
+    let newY = position.y;
+
+    // If the box would overflow the right or bottom edge, push it left/up
+    if (newX + boxWidth > windowWidth) {
+      newX = Math.max(0, windowWidth - boxWidth);
+    }
+    if (newY + boxHeight > windowHeight) {
+      newY = Math.max(0, windowHeight - boxHeight);
+    }
+
+    // If the box is off the left or top edge, push it back in
+    if (newX < 0) newX = 0;
+    if (newY < 0) newY = 0;
+
+    // Only update if position changed
+    if (newX !== position.x || newY !== position.y) {
+      setPosition({ x: newX, y: newY });
+    }
+  };
+
+  // Run on mount and on resize
+  repositionIfViewportShrinks();
+  window.addEventListener('resize', repositionIfViewportShrinks);
+  return () => window.removeEventListener('resize', repositionIfViewportShrinks);
+}, [position]);
+
     return (
         <div 
         ref={boxRef}
         style={
             isSmallScreen
-            ? { position: 'relative', width: '100%', zIndex }
+            ? { position: 'relative', width: '97.5%', zIndex }
             : { position: 'absolute', left: position.x, top: position.y, zIndex }
         }
         className={`rounded-lg bg-gradient-to-b from-white/20 to-white/5 overflow-hidden shadow-2xl backdrop-blur-md bg-white/10 ${
-            isSmallScreen ? `w-full m-2 ${order}` : 'w-fit'
+            isSmallScreen ? `w-fit m-2 ${order}` : ''
         }`}
         >
             <div className={`flex glass-header px-3 py-2 bg-linear-65 ${headerColor ? headerColor : "from-black"} to-white/5 ${isDragging ? 'cursor-grabbing' : 'cursor-grab'}`} onMouseDown={handleMouseDown}>
                 {(icon != null) && (<img src={icon} alt='The icon of the window' className={`mr-1 ${iconW} ${iconH} select-none pointer-events-none`}></img>)}
                 <h3 className="text-sm font-semibold text-white">{title}</h3>
             </div>
-            <div className="px-6 py-4 bg-white/20 text-black">
+            <div className={`px-6 py-4 bg-white/20 text-black ${isSmallScreen ? '' : `${sizeClasses}`}`}>
                 {children}
             </div>
         </div>

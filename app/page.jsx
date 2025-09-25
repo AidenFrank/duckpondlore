@@ -5,7 +5,7 @@ export default function Page() {
     return (
         <>
             <GlassBoxProvider>
-                <div className='flex flex-wrap'>
+                <div className='relative w-screen h-screen overflow-x-hidden'>
                     <GlassBoxManager boxIds={['about', 'butterdog', 'walkingduck', 'frutigeraero1']}/>
                 </div>
             </GlassBoxProvider>

@@ -34,6 +34,7 @@ export default function GlassBoxManager({ boxIds }) {
           headerColor={box.headerColor}
           initialX={box.initialX}
           initialY={box.initialY}
+          sizeClasses={box.sizeClasses}
           order={box.order}
         >
           {box.content}

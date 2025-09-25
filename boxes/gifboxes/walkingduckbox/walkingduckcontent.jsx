@@ -1,3 +1,7 @@
 export default function WalkingduckContent() {
-  return (<img src="/gifs/walkingduck.gif" alt="A low quality small gif of a duck walking"/>);
+  return (
+    <div className="flex items-center justify-center w-full h-full">
+      <img src="/gifs/walkingduck.gif" alt="A low quality small gif of a duck walking" className="w-[500px] h-[500px]"/>
+    </div>
+  );
 }

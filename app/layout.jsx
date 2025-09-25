@@ -29,7 +29,6 @@ export default function RootLayout({ children }) {
         <WaterBackground>
           {children}
         </WaterBackground>
-        <Footer />
       </body>
     </html>
   );

@@ -5,6 +5,7 @@ const WalkingduckBox = {
   title: 'QUACK',
   initialX: 50,
   initialY: 325,
+  sizeClasses: 'w-[500px] h-[500px]',
   order: 'order-3',
   content: <WalkingduckContent />,
 };
