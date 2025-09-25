@@ -9,10 +9,10 @@ export default function AboutContent() {
                 <h1 className="text-2xl md:text-4xl font-extrabold">Welcome to The Duckpond!</h1>
             </div>
         </div>
-        <div className=" text-justify gap-2 w-fit">
-            <div>
-                <p>The Duckpond is a super awesome Discord server where ducks play games, talk, and chill in the pond.</p>
-                <p>The Discord server also has a ton of lore, so this website was made to keep track of it.</p>
+        <div className="flex items-center justify-center">
+            <div className="text-center gap-2 w-fit">
+                <p>The Duckpond is a place where ducks come to quack, play games, and chill.</p>
+                <p>Feel free to poke around the site and maybe even join the Discord.</p>
                 <p>Please enjoy your stay!</p>
             </div>
         </div>

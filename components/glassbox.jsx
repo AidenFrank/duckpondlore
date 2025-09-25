@@ -10,8 +10,15 @@ export function GlassBox({
     const [isDragging, setIsDragging] = useState(false);
     const [isSmallScreen, setIsSmallScreen] = useState(false);
     const [zIndex, setZIndex] = useState(topZIndex);
+    const [hasMounted, setHasMounted] = useState(false);
     const dragOffset = useRef({ x: 0, y: 0 });
     const boxRef = useRef(null);
+
+    useEffect(() => {
+    const delay = (Math.random() * 1000) + 1000;
+    const timer = setTimeout(() => setHasMounted(true), delay);
+    return () => clearTimeout(timer);
+    }, []);
 
     useEffect(() => {
         const checkScreenSize = () => {
@@ -26,11 +33,15 @@ export function GlassBox({
         };
     }, []);
 
+    const increaseZIndex = (e) => {
+        topZIndex+= 1;
+        setZIndex(topZIndex);
+    }
 
     const handleMouseDown = (e) => {
     if (isSmallScreen) return;
-    topZIndex += 1;
-    setZIndex(topZIndex);
+    if (!hasMounted) return;
+    increaseZIndex();
     setIsDragging(true);
     dragOffset.current = {
         x: e.clientX - position.x,
@@ -123,15 +134,16 @@ useEffect(() => {
             ? { position: 'relative', width: '97.5%', zIndex }
             : { position: 'absolute', left: position.x, top: position.y, zIndex }
         }
-        className={`rounded-lg bg-gradient-to-b from-white/20 to-white/5 overflow-hidden shadow-2xl backdrop-blur-md bg-white/10 ${
-            isSmallScreen ? `w-fit m-2 ${order}` : ''
+        className={`rounded-lg bg-gradient-to-b from-white/20 to-white/5 overflow-hidden shadow-2xl backdrop-blur-md bg-white/10
+            transform transition duration-500 ease-out ${hasMounted ? 'animate-pop' : 'opacity-0 scale-0'}
+            ${isSmallScreen ? `w-fit m-2 ${order}` : ''
         }`}
         >
             <div className={`flex glass-header px-3 py-2 bg-linear-65 ${headerColor ? headerColor : "from-black"} to-white/5 ${isDragging ? 'cursor-grabbing' : 'cursor-grab'}`} onMouseDown={handleMouseDown}>
                 {(icon != null) && (<img src={icon} alt='The icon of the window' className={`mr-1 ${iconW} ${iconH} select-none pointer-events-none`}></img>)}
                 <h3 className="text-sm font-semibold text-white">{title}</h3>
             </div>
-            <div className={`px-6 py-4 bg-white/20 text-black ${isSmallScreen ? '' : `${sizeClasses}`}`}>
+            <div className={`px-6 py-4 bg-white/20 text-black ${isSmallScreen ? '' : `${sizeClasses}`}`} onMouseDown={increaseZIndex}>
                 {children}
             </div>
         </div>

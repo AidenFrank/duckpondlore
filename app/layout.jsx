@@ -23,6 +23,8 @@ export default function RootLayout({ children }) {
       <head>
         <Script src="https://code.jquery.com/jquery-3.6.0.min.js" strategy="beforeInteractive" />
         <Script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.ripples/0.5.3/jquery.ripples.min.js" strategy="beforeInteractive" />
+        <title>The Duckpond</title>
+        <link rel="icon" href="/The_Duckpond.ico" />
       </head>
       <body>
         <RippleInit />
