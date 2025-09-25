@@ -11,7 +11,7 @@ export default function AboutContent() {
         </div>
         <div className=" text-justify gap-2 w-fit">
             <div>
-                <p>The Duckpond, founded in 2018, is a super awesome Discord server where people play games and talk.</p>
+                <p>The Duckpond is a super awesome Discord server where ducks play games, talk, and chill in the pond.</p>
                 <p>The Discord server also has a ton of lore, so this website was made to keep track of it.</p>
                 <p>Please enjoy your stay!</p>
             </div>

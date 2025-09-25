@@ -6,7 +6,7 @@ export default function Page() {
         <>
             <GlassBoxProvider>
                 <div className='relative w-screen h-screen overflow-x-hidden'>
-                    <GlassBoxManager boxIds={['about', 'butterdog', 'walkingduck', 'frutigeraero1']}/>
+                    <GlassBoxManager boxIds={['about', 'help', 'butterdog', 'walkingduck', 'frutigeraero1']}/>
                 </div>
             </GlassBoxProvider>
         </>

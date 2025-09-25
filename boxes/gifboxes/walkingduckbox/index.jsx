@@ -3,9 +3,9 @@ import WalkingduckContent from './walkingduckcontent.jsx';
 const WalkingduckBox = {
   id: 'walkingduck',
   title: 'QUACK',
-  initialX: 50,
+  initialX: 20,
   initialY: 325,
-  sizeClasses: 'w-[500px] h-[500px]',
+  sizeClasses: 'w-[200px] h-[200px]',
   order: 'order-3',
   content: <WalkingduckContent />,
 };

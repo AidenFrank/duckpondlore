@@ -8,7 +8,7 @@ if (!boxName) {
 }
 
 const pascalName = boxName.charAt(0).toUpperCase() + boxName.slice(1);
-const folderName = `${boxName.toLowerCase()}box`;
+const folderName = `${boxName.toLowerCase()}`;
 const contentFileName = `${boxName.toLowerCase()}content.jsx`;
 
 const boxDir = path.join(__dirname, '../boxes', folderName);
