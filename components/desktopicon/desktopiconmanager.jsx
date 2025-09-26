@@ -28,6 +28,7 @@ export default function DesktopIconManager({ iconIds }) {
                     title={icon.title}
                     icon={icon.icon}
                     link={icon.link}
+                    glassbox={icon.glassbox}
                     iconW={icon.iconW}
                     iconH={icon.iconH}
                     initialX={icon.initialX}

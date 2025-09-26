@@ -1,11 +1,13 @@
 'use client';
 
 import { useRef, useEffect, useState } from 'react';
+import { useGlassBox } from 'context/glassboxcontext';
 
 export default function DesktopIcon({
     title,
     icon,
     link,
+    glassbox,
     iconW = 'w-12',
     iconH = 'h-12',
     initialX = 40,
@@ -15,6 +17,7 @@ export default function DesktopIcon({
     const clickCount = useRef(0);
     const clickTimer = useRef(null);
     const [isSmallScreen, setIsSmallScreen] = useState(false);
+    const { spawnBox } = useGlassBox();
 
     useEffect(() => {
         const checkScreenSize = () => {
@@ -34,7 +37,16 @@ export default function DesktopIcon({
         } else if (clickCount.current === 2) {
             clearTimeout(clickTimer.current);
             clickCount.current = 0;
-            window.open(link, '_blank');
+            if (link) {
+                window.open(link, '_blank');
+            } else if (glassbox) {
+                if (typeof glassbox === 'string') {
+                    spawnBox(glassbox);
+                } else if (typeof glassbox === 'object' && glassbox.id) {
+                    const { id, ...options } = glassbox;
+                    spawnBox(id, options);
+                }
+            }
         }
     };
 
