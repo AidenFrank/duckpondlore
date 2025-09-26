@@ -1,10 +1,12 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
+import { useGlassBox } from '../context/glassboxcontext';
 
 let topZIndex = 1000;
 
 export function GlassBox({
+    id,
     title,
     icon,
     iconW = 'w-5',
@@ -21,14 +23,43 @@ export function GlassBox({
     const [isSmallScreen, setIsSmallScreen] = useState(false);
     const [zIndex, setZIndex] = useState(topZIndex);
     const [hasMounted, setHasMounted] = useState(false);
+    const [shouldAnimate, setShouldAnimate] = useState(true);
+    const { boxes, toggleVisibility, updateBox } = useGlassBox();
+    const boxState = boxes[id];
     const dragOffset = useRef({ x: 0, y: 0 });
     const boxRef = useRef(null);
+    const prevVisibleRef = useRef(boxState.visible);
+    const [visibilityAnimation, setVisibilityAnimation] = useState('');
+
+    if (!boxState) return null;
+
+    const { visible } = boxState;
 
     useEffect(() => {
         const delay = Math.random() * 1000 + 1000;
-        const timer = setTimeout(() => setHasMounted(true), delay);
+        const timer = setTimeout(() => {
+            setHasMounted(true);
+
+            // Disable animation after it plays
+            setTimeout(() => {
+                setShouldAnimate(false);
+                updateBox(id, { hasRenderedOnce: true });
+            }, 500); // match animation duration
+        }, delay);
+
         return () => clearTimeout(timer);
     }, []);
+
+    useEffect(() => {
+        if (boxState.hasRenderedOnce) {
+            if (boxState.visible && !prevVisibleRef.current) {
+                setVisibilityAnimation('fade-in');
+            } else if (!boxState.visible && prevVisibleRef.current) {
+                setVisibilityAnimation('fade-out');
+            }
+        }
+        prevVisibleRef.current = boxState.visible;
+    }, [boxState.visible, boxState.hasRenderedOnce]);
 
     useEffect(() => {
         const checkScreenSize = () => {
@@ -135,36 +166,50 @@ export function GlassBox({
     }, [position]);
 
     return (
-        <div
-            ref={boxRef}
-            style={
-                isSmallScreen
-                    ? { position: 'relative', width: '97.5%', zIndex }
-                    : { position: 'absolute', left: position.x, top: position.y, zIndex }
-            }
-            className={`rounded-lg bg-gradient-to-b from-white/20 to-white/5 overflow-hidden shadow-2xl backdrop-blur-md bg-white/10
-            transform transition duration-500 ease-out ${hasMounted ? 'animate-pop' : 'opacity-0 scale-0'}
+        <>
+            {hasMounted && (!isSmallScreen || boxState.visible) && (
+                <div
+                    ref={boxRef}
+                    style={
+                        isSmallScreen
+                            ? {
+                                  position: 'relative',
+                                  width: '97.5%',
+                                  zIndex
+                              }
+                            : {
+                                  position: 'absolute',
+                                  left: position.x,
+                                  top: position.y,
+                                  zIndex,
+                                  pointerEvents: boxState.visible ? 'auto' : 'none'
+                              }
+                    }
+                    className={`rounded-lg bg-gradient-to-b from-white/20 to-white/5 overflow-hidden shadow-2xl backdrop-blur-md bg-white/10
+            transform transition duration-500 ease-out ${shouldAnimate ? 'animate-pop' : !isSmallScreen ? visibilityAnimation : ''}
             ${isSmallScreen ? `w-fit m-2 ${order}` : ''}`}
-        >
-            <div
-                className={`flex glass-header px-3 py-2 bg-linear-65 ${headerColor ? headerColor : 'from-black'} to-white/5 ${isDragging ? 'cursor-grabbing' : 'cursor-grab'}`}
-                onMouseDown={handleMouseDown}
-            >
-                {icon != null && (
-                    <img
-                        src={icon}
-                        alt="The icon of the window"
-                        className={`mr-1 ${iconW} ${iconH} select-none pointer-events-none`}
-                    ></img>
-                )}
-                <h3 className="text-sm font-semibold text-white">{title}</h3>
-            </div>
-            <div
-                className={`px-6 py-4 bg-white/20 text-black ${isSmallScreen ? '' : `${sizeClasses}`}`}
-                onMouseDown={increaseZIndex}
-            >
-                {children}
-            </div>
-        </div>
+                >
+                    <div
+                        className={`flex glass-header px-3 py-2 bg-linear-65 ${headerColor ? headerColor : 'from-black'} to-white/5 ${isDragging ? 'cursor-grabbing' : 'cursor-grab'}`}
+                        onMouseDown={handleMouseDown}
+                    >
+                        {icon != null && (
+                            <img
+                                src={icon}
+                                alt="The icon of the window"
+                                className={`mr-1 ${iconW} ${iconH} select-none pointer-events-none`}
+                            ></img>
+                        )}
+                        <h3 className="text-sm font-semibold text-white">{title}</h3>
+                    </div>
+                    <div
+                        className={`px-6 py-4 bg-white/20 text-black ${isSmallScreen ? '' : `${sizeClasses}`}`}
+                        onMouseDown={increaseZIndex}
+                    >
+                        {children}
+                    </div>
+                </div>
+            )}
+        </>
     );
 }

@@ -5,9 +5,9 @@ import { GlassBox } from './glassbox';
 import { allBoxes } from '../boxes/registry.jsx';
 import { useGlassBox } from '../context/glassboxcontext';
 
-export default function GlassBoxManager({ boxInstances }) {
+export default function GlassBoxManager({}) {
+    const { boxes, registerBox, boxInstances } = useGlassBox();
     const [boxConfigs, setBoxConfigs] = useState([]);
-    const { boxes, registerBox } = useGlassBox();
 
     useEffect(() => {
         const loadBoxes = async () => {
@@ -29,25 +29,23 @@ export default function GlassBoxManager({ boxInstances }) {
 
     return (
         <>
-            {boxConfigs.map(
-                (box) =>
-                    boxes[box.id]?.visible && (
-                        <GlassBox
-                            key={box.id}
-                            title={box.title}
-                            icon={box.icon}
-                            iconW={box.iconW}
-                            iconH={box.iconH}
-                            headerColor={box.headerColor}
-                            initialX={box.initialX}
-                            initialY={box.initialY}
-                            sizeClasses={box.sizeClasses}
-                            order={box.order}
-                        >
-                            {box.content}
-                        </GlassBox>
-                    )
-            )}
+            {boxConfigs.map((box) => (
+                <GlassBox
+                    key={box.id}
+                    id={box.id}
+                    title={box.title}
+                    icon={box.icon}
+                    iconW={box.iconW}
+                    iconH={box.iconH}
+                    headerColor={box.headerColor}
+                    initialX={box.initialX}
+                    initialY={box.initialY}
+                    sizeClasses={box.sizeClasses}
+                    order={box.order}
+                >
+                    {box.content}
+                </GlassBox>
+            ))}
         </>
     );
 }
