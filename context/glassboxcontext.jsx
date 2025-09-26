@@ -56,4 +56,10 @@ export function GlassBoxProvider({ children, initialBoxInstances = [] }) {
     );
 }
 
-export const useGlassBox = () => useContext(GlassBoxContext);
+export const useGlassBox = () => {
+    const context = useContext(GlassBoxContext);
+    if (!context) {
+        throw new Error('useGlassBox must be used within a GlassBoxProvider');
+    }
+    return context;
+};
