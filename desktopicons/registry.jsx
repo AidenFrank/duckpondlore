@@ -1,4 +1,5 @@
 export const allIcons = {
+    oldwiki: () => import('./oldwiki.jsx'),
     duck: () => import('./duck.jsx'),
-    test: () => import('./test'),
+    test: () => import('./test.jsx')
 };

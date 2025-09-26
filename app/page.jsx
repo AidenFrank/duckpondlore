@@ -6,9 +6,9 @@ export default function Page() {
     return (
         <>
             <GlassBoxProvider>
-                <div className='relative w-screen h-screen overflow-x-hidden'>
-                    <GlassBoxManager boxIds={['about', 'help', 'butterdog', 'walkingduck', 'frutigeraero1']}/>
-                    <DesktopIconManager iconIds={['test', 'duck']} />
+                <div className="relative w-screen h-screen overflow-x-hidden">
+                    <GlassBoxManager boxIds={['about', 'help', 'butterdog', 'walkingduck', 'frutigeraero1']} />
+                    <DesktopIconManager iconIds={['test', 'duck', 'oldwiki']} />
                 </div>
             </GlassBoxProvider>
         </>

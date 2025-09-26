@@ -3,8 +3,8 @@ const path = require('path');
 
 const boxName = process.argv[2];
 if (!boxName) {
-  console.error('❌ Please provide a box name');
-  process.exit(1);
+    console.error('❌ Please provide a box name');
+    process.exit(1);
 }
 
 const pascalName = boxName.charAt(0).toUpperCase() + boxName.slice(1);
@@ -18,13 +18,13 @@ const registryFilePath = path.join(__dirname, '../boxes/registry.jsx');
 
 // Create folder
 if (!fs.existsSync(boxDir)) {
-  fs.mkdirSync(boxDir);
+    fs.mkdirSync(boxDir);
 }
 
 // Create content file
 fs.writeFileSync(
-  contentFilePath,
-  `export default function ${pascalName}Content() {
+    contentFilePath,
+    `export default function ${pascalName}Content() {
   return (
     <div className="">
       <p>This is the ${pascalName} box content.</p>
@@ -36,8 +36,8 @@ fs.writeFileSync(
 
 // Create index.jsx
 fs.writeFileSync(
-  indexFilePath,
-  `import ${pascalName}Content from './${contentFileName}';
+    indexFilePath,
+    `import ${pascalName}Content from './${contentFileName}';
 
 const ${pascalName}Box = {
   id: '${boxName.toLowerCase()}',
@@ -56,10 +56,7 @@ export default ${pascalName}Box;
 const registryContent = fs.readFileSync(registryFilePath, 'utf8');
 const newEntry = `  ${boxName.toLowerCase()}: () => import('./${folderName}'),\n`;
 
-const updatedRegistry = registryContent.replace(
-  /export const allBoxes = {\s*/,
-  match => match + newEntry
-);
+const updatedRegistry = registryContent.replace(/export const allBoxes = {\s*/, (match) => match + newEntry);
 
 fs.writeFileSync(registryFilePath, updatedRegistry);
 
