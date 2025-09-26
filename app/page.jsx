@@ -13,7 +13,8 @@ export default function Page() {
                     { id: 'help', type: 'help' },
                     { id: 'frutigeraero1', type: 'frutigeraero1' },
                     { id: 'walkingduck', type: 'walkingduck' },
-                    { id: 'butterdog1', type: 'butterdog' }
+                    { id: 'butterdog1', type: 'butterdog' },
+                    { id: 'mikudance', type: 'mikudance' }
                 ]}
             >
                 <div className="relative w-screen h-screen overflow-x-hidden">

@@ -6,7 +6,7 @@ const AboutBox = {
     icon: '/gifs/smileywave.gif',
     iconW: 'w-8',
     headerColor: 'from-green-900',
-    initialX: 20,
+    initialX: 350,
     initialY: 20,
     order: 'order-1',
     content: <AboutContent />
