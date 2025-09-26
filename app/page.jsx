@@ -1,3 +1,5 @@
+'use client';
+
 import { GlassBoxProvider } from '../context/glassboxcontext';
 import GlassBoxManager from '../components/glassboxmanager';
 import DesktopIconManager from 'components/desktopicon/desktopiconmanager';
