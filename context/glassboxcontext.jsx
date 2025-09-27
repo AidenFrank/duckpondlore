@@ -1,6 +1,7 @@
 'use client';
 
 import { createContext, useContext, useState } from 'react';
+import { allBoxes } from '../boxes/registry.jsx';
 
 const GlassBoxContext = createContext();
 
@@ -33,10 +34,17 @@ export function GlassBoxProvider({ children, initialBoxInstances = [] }) {
     const spawnBox = (type, overrides = {}) => {
         const id = overrides.id || `box-${Date.now()}`;
         const title = overrides.title || type.charAt(0).toUpperCase() + type.slice(1);
+
         const newInstance = { id, type, title, ...overrides };
         setBoxInstances((prev) => [...prev, newInstance]);
 
-        registerBox(id, { ...overrides.initialState, title });
+        // ✅ Pass icon, headerColor, initialX, etc. directly
+        registerBox(id, {
+            ...overrides,
+            title,
+            type,
+            id
+        });
     };
 
     const toggleVisibility = (id) => {

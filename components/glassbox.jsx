@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useLayoutEffect } from 'react';
 import { useGlassBox } from '../context/glassboxcontext';
 
 let topZIndex = 1000;
@@ -128,8 +128,31 @@ export function GlassBox({
         };
     }, [isDragging]);
 
+    useLayoutEffect(() => {
+        const box = boxRef.current;
+        if (!box) return;
+
+        const boxWidth = box.offsetWidth;
+        const boxHeight = box.offsetHeight;
+        const windowWidth = window.innerWidth;
+        const windowHeight = window.innerHeight;
+
+        let newX = position.x;
+        let newY = position.y;
+
+        const maxX = windowWidth - boxWidth;
+        const maxY = windowHeight - boxHeight;
+
+        newX = Math.min(Math.max(0, newX), maxX);
+        newY = Math.min(Math.max(0, newY), maxY);
+
+        if (newX !== position.x || newY !== position.y) {
+            setPosition({ x: newX, y: newY });
+        }
+    }, [hasMounted]); // only clamp once after mount
+
     useEffect(() => {
-        const repositionIfViewportShrinks = () => {
+        const handleResize = () => {
             const box = boxRef.current;
             if (!box) return;
 
@@ -141,29 +164,18 @@ export function GlassBox({
             let newX = position.x;
             let newY = position.y;
 
-            // If the box would overflow the right or bottom edge, push it left/up
-            if (newX + boxWidth > windowWidth) {
-                newX = Math.max(0, windowWidth - boxWidth);
-            }
-            if (newY + boxHeight > windowHeight) {
-                newY = Math.max(0, windowHeight - boxHeight);
-            }
+            const maxX = windowWidth - boxWidth;
+            const maxY = windowHeight - boxHeight;
 
-            // If the box is off the left or top edge, push it back in
-            if (newX < 0) newX = 0;
-            if (newY < 0) newY = 0;
+            newX = Math.min(Math.max(0, newX), maxX);
+            newY = Math.min(Math.max(0, newY), maxY);
 
-            // Only update if position changed
-            if (newX !== position.x || newY !== position.y) {
-                setPosition({ x: newX, y: newY });
-            }
+            setPosition({ x: newX, y: newY });
         };
 
-        // Run on mount and on resize
-        repositionIfViewportShrinks();
-        window.addEventListener('resize', repositionIfViewportShrinks);
-        return () => window.removeEventListener('resize', repositionIfViewportShrinks);
-    }, [position]);
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, [position.x, position.y]);
 
     return (
         <>

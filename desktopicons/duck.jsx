@@ -9,8 +9,12 @@ const DuckIcon = {
     glassbox: {
         id: 'walkingduck',
         title: 'QUACK',
-        initialX: 300,
-        initialY: 300
+        icon: '/gifs/walkingduck.gif',
+        headerColor: 'from-red-900',
+        initialX: 100,
+        initialY: 100,
+        sizeClasses: 'w-[200px] h-[200px]',
+        order: 'order-3'
     }
 };
 

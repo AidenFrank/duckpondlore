@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useGlassBox } from 'context/glassboxcontext';
-import StartButton from 'components/startbutton/startbutton';
+import StartButton from 'components/start/startbutton';
 
 export default function Footer() {
     const { boxes, boxInstances, toggleVisibility } = useGlassBox();
@@ -30,6 +30,7 @@ export default function Footer() {
                 <div className="flex min-w-max h-full">
                     {orderedBoxes.map(({ id }) => {
                         const box = boxes[id];
+
                         if (!box) return null;
 
                         const { title, icon, visible } = box;

@@ -2,7 +2,7 @@ import MikudanceContent from './mikudancecontent.jsx';
 
 const MikudanceBox = {
     id: 'mikudance',
-    title: 'Mikudance',
+    title: 'Miku be Dancin!!!',
     icon: '/images/mikuleek.webp',
     headerColor: 'from-blue-900',
     initialX: 20,

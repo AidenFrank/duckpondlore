@@ -2,7 +2,7 @@ import ButterDogContent from './butterdogcontent';
 
 const ButterDogBox = {
     id: 'butterdog',
-    title: 'Butter Dog 🧈',
+    title: '🧈 Butter Dog',
     initialX: 290,
     initialY: 325,
     sizeClasses: 'w-[300px] h-[300px] xl:w-[500px] xl:h-[500px]',
