@@ -47,6 +47,16 @@ export function GlassBoxProvider({ children, initialBoxInstances = [] }) {
         });
     };
 
+    const closeBox = (id) => {
+        setBoxes((prev) => {
+            const newBoxes = { ...prev };
+            delete newBoxes[id];
+            return newBoxes;
+        });
+
+        setBoxInstances((prev) => prev.filter((box) => box.id !== id));
+    };
+
     const toggleVisibility = (id) => {
         setBoxes((prev) => ({
             ...prev,
@@ -58,7 +68,9 @@ export function GlassBoxProvider({ children, initialBoxInstances = [] }) {
     };
 
     return (
-        <GlassBoxContext.Provider value={{ boxes, registerBox, updateBox, boxInstances, spawnBox, toggleVisibility }}>
+        <GlassBoxContext.Provider
+            value={{ boxes, registerBox, updateBox, boxInstances, spawnBox, toggleVisibility, closeBox }}
+        >
             {children}
         </GlassBoxContext.Provider>
     );

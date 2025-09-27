@@ -24,15 +24,14 @@ export function GlassBox({
     const [zIndex, setZIndex] = useState(topZIndex);
     const [hasMounted, setHasMounted] = useState(false);
     const [shouldAnimate, setShouldAnimate] = useState(true);
-    const { boxes, toggleVisibility, updateBox } = useGlassBox();
-    const boxState = boxes[id];
+    const { boxes, toggleVisibility, updateBox, closeBox } = useGlassBox();
     const dragOffset = useRef({ x: 0, y: 0 });
     const boxRef = useRef(null);
-    const prevVisibleRef = useRef(boxState.visible);
     const [visibilityAnimation, setVisibilityAnimation] = useState('');
-
-    if (!boxState) return null;
-
+    const boxState = boxes[id];
+    const prevVisibleRef = useRef(false); // always run
+    const isMissing = !boxState;
+    if (isMissing) return null;
     const { visible } = boxState;
 
     useEffect(() => {
@@ -51,15 +50,15 @@ export function GlassBox({
     }, []);
 
     useEffect(() => {
-        if (boxState.hasRenderedOnce) {
+        if (!isMissing && boxState.hasRenderedOnce) {
             if (boxState.visible && !prevVisibleRef.current) {
                 setVisibilityAnimation('fade-in');
             } else if (!boxState.visible && prevVisibleRef.current) {
                 setVisibilityAnimation('fade-out');
             }
+            prevVisibleRef.current = boxState.visible;
         }
-        prevVisibleRef.current = boxState.visible;
-    }, [boxState.visible, boxState.hasRenderedOnce]);
+    }, [boxState?.visible, boxState?.hasRenderedOnce]);
 
     useEffect(() => {
         const checkScreenSize = () => {
@@ -179,7 +178,7 @@ export function GlassBox({
 
     return (
         <>
-            {hasMounted && (!isSmallScreen || boxState.visible) && (
+            {hasMounted && (!isSmallScreen || boxState?.visible) && (
                 <div
                     ref={boxRef}
                     style={
@@ -194,7 +193,7 @@ export function GlassBox({
                                   left: position.x,
                                   top: position.y,
                                   zIndex,
-                                  pointerEvents: boxState.visible ? 'auto' : 'none'
+                                  pointerEvents: boxState?.visible ? 'auto' : 'none'
                               }
                     }
                     className={`rounded-lg bg-gradient-to-b from-white/20 to-white/5 overflow-hidden shadow-2xl backdrop-blur-md bg-white/10
@@ -213,6 +212,35 @@ export function GlassBox({
                             ></img>
                         )}
                         <h3 className="text-sm font-semibold text-white">{title}</h3>
+                        <button
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                toggleVisibility(id);
+                            }}
+                            className="absolute top-0 right-[45px] w-8 h-6 font-bold border border-white/30 shadow-sm
+               bg-gradient-to-b from-white/20 via-white/30 to-white/20
+               hover:from-white/30 hover:via-white/40 hover:to-white/30
+               text-white flex items-center justify-center rounded-b-sm
+               transition-colors duration-200 ease-in-out
+               active:translate-y-[1px] active:shadow-inner glassy-button"
+                        >
+                            <span className="drop-shadow-[0_1px_1px_white]">—</span>
+                        </button>
+
+                        <button
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                closeBox(id);
+                            }}
+                            className="absolute top-0 right-1 w-11 h-6 font-bold border border-red-700 shadow-sm
+               bg-gradient-to-b from-red-600 via-red-700 to-red-600
+               hover:from-red-500 hover:via-red-600 hover:to-red-500
+               text-white flex items-center justify-center
+               rounded-br-sm transition-colors duration-200 ease-in-out
+               active:translate-y-[1px] active:shadow-inner glassy-button"
+                        >
+                            <span className="drop-shadow-[0_1px_1px_black]">✕</span>
+                        </button>
                     </div>
                     <div
                         className={`px-6 py-4 bg-white/20 text-black ${isSmallScreen ? '' : `${sizeClasses}`}`}

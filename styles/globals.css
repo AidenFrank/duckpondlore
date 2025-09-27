@@ -9,6 +9,19 @@
     --font-nunito: 'Nunito', sans-serif;
 }
 
+.glassy-button::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 50%;
+    background: linear-gradient(to bottom, rgba(255, 255, 255, 0.3), transparent);
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+    pointer-events: none;
+}
+
 .glass-taskbar {
     background: linear-gradient(to top, rgba(0, 0, 0, 0.6), rgba(50, 50, 50, 0.4));
     backdrop-filter: blur(8px);

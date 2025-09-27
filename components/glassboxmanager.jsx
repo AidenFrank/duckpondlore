@@ -29,23 +29,27 @@ export default function GlassBoxManager({}) {
 
     return (
         <>
-            {boxConfigs.map((box) => (
-                <GlassBox
-                    key={box.id}
-                    id={box.id}
-                    title={box.title}
-                    icon={box.icon}
-                    iconW={box.iconW}
-                    iconH={box.iconH}
-                    headerColor={box.headerColor}
-                    initialX={box.initialX}
-                    initialY={box.initialY}
-                    sizeClasses={box.sizeClasses}
-                    order={box.order}
-                >
-                    {box.content}
-                </GlassBox>
-            ))}
+            {boxConfigs.map((box) => {
+                if (!boxes[box.id]) return null; // 🛡️ Guard: skip deleted boxes
+
+                return (
+                    <GlassBox
+                        key={box.id}
+                        id={box.id}
+                        title={box.title}
+                        icon={box.icon}
+                        iconW={box.iconW}
+                        iconH={box.iconH}
+                        headerColor={box.headerColor}
+                        initialX={box.initialX}
+                        initialY={box.initialY}
+                        sizeClasses={box.sizeClasses}
+                        order={box.order}
+                    >
+                        {box.content}
+                    </GlassBox>
+                );
+            })}
         </>
     );
 }
