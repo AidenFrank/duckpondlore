@@ -1,43 +1,63 @@
+// components/glassboxmanager.jsx
 'use client';
 
 import { useEffect, useState } from 'react';
 import { GlassBox } from './glassbox';
-import { allBoxes } from '../boxes/registry.jsx';
+import { loadBoxes } from '../boxes/registry.jsx';
 import { useGlassBox } from '../context/glassboxcontext';
+import { templates } from '../boxes/templates';
 
-export default function GlassBoxManager({}) {
+export default function GlassBoxManager() {
     const { boxes, registerBox, boxInstances } = useGlassBox();
     const [boxConfigs, setBoxConfigs] = useState([]);
 
     useEffect(() => {
-        const loadBoxes = async () => {
-            // preserve order: if a type is missing in registry, keep null to avoid shifting
-            const loaders = boxInstances.map((inst) => allBoxes[inst.type] || null);
-            const modules = await Promise.all(loaders.map((loader) => (loader ? loader() : Promise.resolve(null))));
-            const templates = modules.map((mod) => (mod ? mod.default : {}));
+        const loadAndMerge = async () => {
+            const registry = await loadBoxes(); // fetches/constructs loaders from JSON
+            // For each instance, call the proper registry loader (if one exists)
+            const merged = await Promise.all(
+                boxInstances.map(async (inst) => {
+                    const loader = registry[inst.type];
+                    if (!loader) {
+                        // no registry entry found for this type -> just use the instance as-is
+                        return inst;
+                    }
+                    try {
+                        const cfg = await loader(); // cfg is the config object returned by the loader
+                        // merge registry config -> instance overrides (instance overrides registry)
+                        return {
+                            ...cfg,
+                            ...inst
+                        };
+                    } catch (err) {
+                        console.error('Error loading box template/config for', inst.type, err);
+                        return inst;
+                    }
+                })
+            );
 
-            // Merge template -> instance (instance overrides template)
-            const mergedConfigs = boxInstances.map((inst, i) => ({
-                ...(templates[i] || {}),
-                ...inst // instance overrides
-            }));
-
-            // Register each box config (context will extract style keys)
-            mergedConfigs.forEach((config) => registerBox(config.id, config));
-            setBoxConfigs(mergedConfigs);
+            // register each config (context will extract style keys)
+            merged.forEach((config) => registerBox(config.id, config));
+            setBoxConfigs(merged);
         };
 
-        loadBoxes();
+        loadAndMerge();
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [boxInstances]);
 
     return (
         <>
             {boxConfigs.map((box) => {
-                if (!boxes[box.id]) return null; // guard: skip deleted/unregistered boxes
+                if (!boxes[box.id]) return null;
 
-                // If the template provides a Wrapper component, wrap the content with it.
-                const contentElement = box.Wrapper ? <box.Wrapper>{box.content}</box.Wrapper> : box.content;
+                // If it's template-driven, render the Template component with data props
+                const contentElement = box.Template ? (
+                    <box.Template {...box} />
+                ) : box.Wrapper ? (
+                    <box.Wrapper>{box.content}</box.Wrapper>
+                ) : (
+                    box.content
+                );
 
                 return (
                     <GlassBox

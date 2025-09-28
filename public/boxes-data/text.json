@@ -1,0 +1,37 @@
+[
+    {
+        "id": "about",
+        "template": "article",
+        "title": "Haii!!!",
+        "heading": "Welcome to The Duckpond!",
+        "icon": "/gifs/smileywave.gif",
+        "iconW": "w-8",
+        "headerColor": "bg-linear-65 from-green-900 to-white/5",
+        "initialX": 320,
+        "initialY": 20,
+        "sizeClasses": "w-[700px] h-[260px]",
+        "order": "order-1",
+        "imageUrl": "/images/The_Duckpond.png",
+        "paragraphs": [
+            "The Duckpond is a place where ducks come to quack, play games, and chill.",
+            "Feel free to poke around the site and maybe even join the Discord.",
+            "Please enjoy your stay!"
+        ]
+    },
+    {
+        "id": "help",
+        "template": "article",
+        "title": "⚠️ Help and Swag 😎 Information",
+        "initialX": 20,
+        "initialY": 900,
+        "sizeClasses": "w-[1000px] h-auto",
+        "order": "order-1",
+        "paragraphs": [
+            "This website is based on a Windows PC and thus is best experienced on a computer.",
+            "You can reorganize the windows by clicking and dragging their heading.",
+            "If you are on mobile or your screen width is too small, then you cannot drag any windows.",
+            "Double click a desktop icon to open it.",
+            "If the windows are too messed up for your liking, simply refresh the page and they will return to their original positions."
+        ]
+    }
+]

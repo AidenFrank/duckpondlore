@@ -25,11 +25,11 @@ export function GlassBoxProvider({ children, initialBoxInstances = [] }) {
 
     const registerBox = (id, initialState = {}) => {
         setBoxes((prev) => {
-            if (prev[id]) return prev; // already registered
+            const existing = prev[id] || {};
 
-            // Extract style keys into a style object, keep the rest as runtime/config
-            const style = {};
-            const rest = {};
+            // Extract style keys into a style object
+            const style = { ...(existing.style || {}) };
+            const rest = { ...existing };
 
             for (const key of Object.keys(initialState)) {
                 if (STYLE_KEYS.includes(key)) {
@@ -42,10 +42,10 @@ export function GlassBoxProvider({ children, initialBoxInstances = [] }) {
             return {
                 ...prev,
                 [id]: {
-                    ...rest, // config/runtime fields (title, type, content, etc.)
-                    visible: true,
-                    hasRenderedOnce: initialState.hasRenderedOnce ?? false,
-                    zIndex: 1000,
+                    ...rest,
+                    visible: existing.visible ?? true,
+                    hasRenderedOnce: initialState.hasRenderedOnce ?? existing.hasRenderedOnce ?? false,
+                    zIndex: existing.zIndex ?? 1000,
                     style
                 }
             };
@@ -83,6 +83,13 @@ export function GlassBoxProvider({ children, initialBoxInstances = [] }) {
                 }
             };
         });
+    };
+
+    const openBox = (type, overrides = {}) => {
+        const id = overrides.id || `${type}-${Date.now()}`;
+        const newInstance = { id, type, ...overrides };
+        setBoxInstances((prev) => [...prev, newInstance]);
+        return id;
     };
 
     const spawnBox = (type, overrides = {}) => {
@@ -124,7 +131,7 @@ export function GlassBoxProvider({ children, initialBoxInstances = [] }) {
 
     return (
         <GlassBoxContext.Provider
-            value={{ boxes, registerBox, updateBox, boxInstances, spawnBox, toggleVisibility, closeBox }}
+            value={{ boxes, registerBox, updateBox, boxInstances, spawnBox, openBox, toggleVisibility, closeBox }}
         >
             {children}
         </GlassBoxContext.Provider>

@@ -9,9 +9,17 @@ export default function Footer() {
     const [orderedBoxes, setOrderedBoxes] = useState([]);
     const [draggedId, setDraggedId] = useState(null);
 
-    const getFirstGrapheme = (str) => {
-        return Array.from(str)[0] || '?';
+    const getFirstGrapheme = (str, fallback = '?') => {
+        if (!str) return fallback;
+        return Array.from(str)[0] || fallback;
     };
+
+    const isEmoji = (char) => {
+        if (!char) return false;
+        const code = char.codePointAt(0);
+        return code >= 0x1f300 && code <= 0x1faff;
+    };
+
     useEffect(() => {
         setOrderedBoxes(boxInstances);
     }, [boxInstances]);
@@ -30,16 +38,18 @@ export default function Footer() {
                 <div className="flex min-w-max h-full">
                     {orderedBoxes.map(({ id }) => {
                         const box = boxes[id];
-
                         if (!box) return null;
 
-                        const { title, visible, style } = box;
+                        const { title = '', visible, style } = box;
                         const { icon, iconW = 'w-10', iconH = 'h-10' } = style || {};
-                        const fallbackLetter = getFirstGrapheme(title);
-                        const isEmoji = (char) => {
-                            const code = char.codePointAt(0);
-                            return code >= 0x1f300 && code <= 0x1faff;
-                        };
+
+                        let fallbackLetter = getFirstGrapheme(title);
+
+                        if (!fallbackLetter) {
+                            const idFirst = getFirstGrapheme(id);
+                            // if ID starts with emoji, keep it — otherwise use its first letter
+                            fallbackLetter = isEmoji(idFirst) ? idFirst : idFirst.toUpperCase();
+                        }
 
                         const emoji = isEmoji(fallbackLetter);
 
@@ -68,12 +78,12 @@ export default function Footer() {
                                         ? 'text-white bg-white/30 border-l border-r border-black/50 rounded-t-md rounded-b-md hover:bg-white/50'
                                         : 'text-gray-400 bg-transparent border-l border-r border-transparent hover:border-black/30'
                                 }`}
-                                title={title}
+                                title={title || id}
                             >
                                 {icon ? (
                                     <img
                                         src={icon}
-                                        alt={title}
+                                        alt={title || id}
                                         className={`w-12 h-12 object-contain transition duration-200 ${
                                             visible ? '' : 'grayscale opacity-60'
                                         }`}
