@@ -16,7 +16,8 @@ export default function Page() {
                     { id: 'frutigeraero1', type: 'frutigeraero1' },
                     { id: 'walkingduck', type: 'walkingduck' },
                     { id: 'butterdog1', type: 'butterdog' },
-                    { id: 'mikudance', type: 'mikudance' }
+                    { id: 'mikudance', type: 'mikudance' },
+                    { id: 'mikuweb', type: 'mikuweb' }
                 ]}
             >
                 <div className="relative w-screen h-screen overflow-x-hidden">

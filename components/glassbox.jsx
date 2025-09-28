@@ -16,7 +16,9 @@ export function GlassBox({
     initialX = 100,
     initialY = 100,
     sizeClasses,
-    order = ''
+    order = '',
+    contentClassName = '',
+    disableDefaultWrapper = false
 }) {
     const [position, setPosition] = useState({ x: initialX, y: initialY });
     const [isDragging, setIsDragging] = useState(false);
@@ -29,10 +31,22 @@ export function GlassBox({
     const boxRef = useRef(null);
     const [visibilityAnimation, setVisibilityAnimation] = useState('');
     const boxState = boxes[id];
-    const prevVisibleRef = useRef(false); // always run
+    const prevVisibleRef = useRef(false);
     const isMissing = !boxState;
     if (isMissing) return null;
     const { visible } = boxState;
+
+    // Read style overrides from context (if present) so runtime updates work
+    const style = boxState?.style || {};
+    const appliedHeaderColor = style.headerColor || headerColor;
+    const appliedSizeClasses = style.sizeClasses || sizeClasses;
+    const appliedContentClassName = style.contentClassName || contentClassName;
+    const appliedDisableDefaultWrapper =
+        typeof style.disableDefaultWrapper !== 'undefined' ? style.disableDefaultWrapper : disableDefaultWrapper;
+    const appliedIcon = style.icon || icon;
+    const appliedIconW = style.iconW || iconW;
+    const appliedIconH = style.iconH || iconH;
+    const appliedOrder = style.order || order;
 
     useEffect(() => {
         const delay = Math.random() * 1000 + 1000;
@@ -50,7 +64,14 @@ export function GlassBox({
     }, []);
 
     useEffect(() => {
-        if (!isMissing && boxState.hasRenderedOnce) {
+        if (id === 'help') {
+            topZIndex += 1;
+            setZIndex(topZIndex);
+        }
+    }, [id]);
+
+    useEffect(() => {
+        if (boxState && boxState.hasRenderedOnce) {
             if (boxState.visible && !prevVisibleRef.current) {
                 setVisibilityAnimation('fade-in');
             } else if (!boxState.visible && prevVisibleRef.current) {
@@ -176,40 +197,39 @@ export function GlassBox({
         return () => window.removeEventListener('resize', handleResize);
     }, [position.x, position.y]);
 
+    // compute outer styles/classes based on small-screen vs normal
+    const outerStyle = isSmallScreen
+        ? { position: 'relative', width: '97.5%', zIndex }
+        : {
+              position: 'absolute',
+              left: position.x,
+              top: position.y,
+              zIndex,
+              pointerEvents: boxState?.visible ? 'auto' : 'none'
+          };
+
     return (
         <>
             {hasMounted && (!isSmallScreen || boxState?.visible) && (
                 <div
                     ref={boxRef}
-                    style={
-                        isSmallScreen
-                            ? {
-                                  position: 'relative',
-                                  width: '97.5%',
-                                  zIndex
-                              }
-                            : {
-                                  position: 'absolute',
-                                  left: position.x,
-                                  top: position.y,
-                                  zIndex,
-                                  pointerEvents: boxState?.visible ? 'auto' : 'none'
-                              }
-                    }
+                    style={outerStyle}
                     className={`rounded-lg bg-gradient-to-b from-white/20 to-white/5 overflow-hidden shadow-2xl backdrop-blur-md bg-white/10
             transform transition duration-500 ease-out ${shouldAnimate ? 'animate-pop' : !isSmallScreen ? visibilityAnimation : ''}
-            ${isSmallScreen ? `w-fit m-2 ${order}` : ''}`}
+            ${isSmallScreen ? `w-fit m-2 ${appliedOrder}` : ''}`}
                 >
                     <div
-                        className={`flex glass-header px-3 py-2 bg-linear-65 ${headerColor ? headerColor : 'from-black'} to-white/5 ${isDragging ? 'cursor-grabbing' : 'cursor-grab'}`}
+                        className={`flex glass-header px-3 py-2 ${appliedHeaderColor || 'bg-linear-65 from-black to-white/5'} ${
+                            isDragging ? 'cursor-grabbing' : 'cursor-grab'
+                        }`}
                         onMouseDown={handleMouseDown}
                     >
-                        {icon != null && (
+                        {appliedIcon != null && (
                             <img
-                                src={icon}
+                                src={appliedIcon}
                                 alt="The icon of the window"
-                                className={`mr-1 ${iconW} ${iconH} select-none pointer-events-none`}
-                            ></img>
+                                className={`mr-1 ${appliedIconW} ${appliedIconH} select-none pointer-events-none`}
+                            />
                         )}
                         <h3 className="text-sm font-semibold text-white">{title}</h3>
                         <button
@@ -242,8 +262,12 @@ export function GlassBox({
                             <span className="drop-shadow-[0_1px_1px_black]">✕</span>
                         </button>
                     </div>
+
+                    {/* content wrapper: respect disableDefaultWrapper and contentClassName */}
                     <div
-                        className={`px-6 py-4 bg-white/20 text-black ${isSmallScreen ? '' : `${sizeClasses}`}`}
+                        className={`bg-white/20 text-black ${isSmallScreen ? '' : sizeClasses} 
+              ${appliedDisableDefaultWrapper ? '' : 'px-6 py-4'} 
+              ${appliedContentClassName} overflow-auto`}
                         onMouseDown={increaseZIndex}
                     >
                         {children}

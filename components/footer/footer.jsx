@@ -33,7 +33,8 @@ export default function Footer() {
 
                         if (!box) return null;
 
-                        const { title, icon, visible } = box;
+                        const { title, visible, style } = box;
+                        const { icon, iconW = 'w-10', iconH = 'h-10' } = style || {};
                         const fallbackLetter = getFirstGrapheme(title);
                         const isEmoji = (char) => {
                             const code = char.codePointAt(0);
@@ -73,7 +74,7 @@ export default function Footer() {
                                     <img
                                         src={icon}
                                         alt={title}
-                                        className={`w-10 h-10 object-contain transition duration-200 ${
+                                        className={`w-12 h-12 object-contain transition duration-200 ${
                                             visible ? '' : 'grayscale opacity-60'
                                         }`}
                                     />

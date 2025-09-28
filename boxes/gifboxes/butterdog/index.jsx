@@ -1,13 +1,15 @@
-import ButterDogContent from './butterdogcontent';
+import { createImageBox } from '../../../utils/createimagebox';
 
-const ButterDogBox = {
+const ButterDogBox = createImageBox({
     id: 'butterdog',
     title: '🧈 Butter Dog',
-    initialX: 290,
+    src: '/gifs/dog-with-butter.gif',
+    alt: 'A dog with butter on its head',
+    initialX: 350,
     initialY: 325,
-    sizeClasses: 'w-[300px] h-[300px] xl:w-[500px] xl:h-[500px]',
     order: 'order-2',
-    content: <ButterDogContent />
-};
+    sizeClasses: 'w-[500px] h-[500px]', // 👈 sets box size (outer)
+    imageClasses: 'w-full h-full object-contain' // 👈 fits inside with padding
+});
 
 export default ButterDogBox;
