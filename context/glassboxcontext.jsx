@@ -15,7 +15,8 @@ const STYLE_KEYS = [
     'order',
     'contentClassName',
     'disableDefaultWrapper',
-    'Wrapper'
+    'Wrapper',
+    'resizable'
 ];
 
 export function GlassBoxProvider({ children, initialBoxInstances = [] }) {
@@ -43,7 +44,7 @@ export function GlassBoxProvider({ children, initialBoxInstances = [] }) {
                 [id]: {
                     ...rest, // config/runtime fields (title, type, content, etc.)
                     visible: true,
-                    hasRenderedOnce: false,
+                    hasRenderedOnce: initialState.hasRenderedOnce ?? false,
                     zIndex: 1000,
                     style
                 }

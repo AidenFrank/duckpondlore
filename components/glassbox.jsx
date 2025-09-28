@@ -26,6 +26,7 @@ export function GlassBox({
     const [zIndex, setZIndex] = useState(topZIndex);
     const [hasMounted, setHasMounted] = useState(false);
     const [shouldAnimate, setShouldAnimate] = useState(true);
+    const [hasPlayedPop, setHasPlayedPop] = useState(false);
     const { boxes, toggleVisibility, updateBox, closeBox } = useGlassBox();
     const dragOffset = useRef({ x: 0, y: 0 });
     const boxRef = useRef(null);
@@ -48,21 +49,24 @@ export function GlassBox({
     const appliedIconH = style.iconH || iconH;
     const appliedOrder = style.order || order;
 
+    // Initial mount + pop animation
     useEffect(() => {
         const delay = Math.random() * 1000 + 1000;
         const timer = setTimeout(() => {
             setHasMounted(true);
 
-            // Disable animation after it plays
+            // Disable pop after it plays once
             setTimeout(() => {
                 setShouldAnimate(false);
+                setHasPlayedPop(true);
                 updateBox(id, { hasRenderedOnce: true });
-            }, 500); // match animation duration
+            }, 500); // match pop duration
         }, delay);
 
         return () => clearTimeout(timer);
     }, []);
 
+    // Special z-index bump for help
     useEffect(() => {
         if (id === 'help') {
             topZIndex += 1;
@@ -70,17 +74,29 @@ export function GlassBox({
         }
     }, [id]);
 
+    // Visibility animations (minimize / restore) — guarded so they don't fire
+    // right after the initial 'pop' mount animation finishes.
     useEffect(() => {
-        if (boxState && boxState.hasRenderedOnce) {
-            if (boxState.visible && !prevVisibleRef.current) {
-                setVisibilityAnimation('fade-in');
-            } else if (!boxState.visible && prevVisibleRef.current) {
-                setVisibilityAnimation('fade-out');
-            }
-            prevVisibleRef.current = boxState.visible;
-        }
-    }, [boxState?.visible, boxState?.hasRenderedOnce]);
+        if (!boxState) return;
 
+        // If the pop hasn't finished, initialize prevVisibleRef and bail out.
+        // This prevents seeing a "false -> true" transition when hasRenderedOnce flips.
+        if (!boxState.hasRenderedOnce || shouldAnimate) {
+            prevVisibleRef.current = boxState.visible;
+            return;
+        }
+
+        // Now we are past the initial pop. Only react to real visibility toggles.
+        if (boxState.visible && !prevVisibleRef.current) {
+            setVisibilityAnimation('restore');
+        } else if (!boxState.visible && prevVisibleRef.current) {
+            setVisibilityAnimation('minimize');
+        }
+
+        prevVisibleRef.current = boxState.visible;
+    }, [boxState?.visible, boxState?.hasRenderedOnce, shouldAnimate]);
+
+    // Small screen detection
     useEffect(() => {
         const checkScreenSize = () => {
             setIsSmallScreen(window.innerWidth < 768); // Tailwind's md breakpoint
@@ -94,7 +110,7 @@ export function GlassBox({
         };
     }, []);
 
-    const increaseZIndex = (e) => {
+    const increaseZIndex = () => {
         topZIndex += 1;
         setZIndex(topZIndex);
     };
@@ -148,6 +164,7 @@ export function GlassBox({
         };
     }, [isDragging]);
 
+    // Clamp inside viewport on mount
     useLayoutEffect(() => {
         const box = boxRef.current;
         if (!box) return;
@@ -169,8 +186,9 @@ export function GlassBox({
         if (newX !== position.x || newY !== position.y) {
             setPosition({ x: newX, y: newY });
         }
-    }, [hasMounted]); // only clamp once after mount
+    }, [hasMounted]);
 
+    // Clamp on window resize
     useEffect(() => {
         const handleResize = () => {
             const box = boxRef.current;
@@ -215,8 +233,9 @@ export function GlassBox({
                     ref={boxRef}
                     style={outerStyle}
                     className={`rounded-lg bg-gradient-to-b from-white/20 to-white/5 overflow-hidden shadow-2xl backdrop-blur-md bg-white/10
-            transform transition duration-500 ease-out ${shouldAnimate ? 'animate-pop' : !isSmallScreen ? visibilityAnimation : ''}
-            ${isSmallScreen ? `w-fit m-2 ${appliedOrder}` : ''}`}
+                        transform transition duration-500 ease-out
+                        ${shouldAnimate ? 'animate-pop' : visibilityAnimation}
+                        ${isSmallScreen ? `w-fit m-2 ${appliedOrder}` : ''}`}
                 >
                     <div
                         className={`flex glass-header px-3 py-2 ${appliedHeaderColor || 'bg-linear-65 from-black to-white/5'} ${
@@ -238,11 +257,11 @@ export function GlassBox({
                                 toggleVisibility(id);
                             }}
                             className="absolute top-0 right-[45px] w-8 h-6 font-bold border border-white/30 shadow-sm
-               bg-gradient-to-b from-white/20 via-white/30 to-white/20
-               hover:from-white/30 hover:via-white/40 hover:to-white/30
-               text-white flex items-center justify-center rounded-b-sm
-               transition-colors duration-200 ease-in-out
-               active:translate-y-[1px] active:shadow-inner glassy-button"
+                                bg-gradient-to-b from-white/20 via-white/30 to-white/20
+                                hover:from-white/30 hover:via-white/40 hover:to-white/30
+                                text-white flex items-center justify-center rounded-b-sm
+                                transition-colors duration-200 ease-in-out
+                                active:translate-y-[1px] active:shadow-inner glassy-button"
                         >
                             <span className="drop-shadow-[0_1px_1px_white]">—</span>
                         </button>
@@ -253,21 +272,21 @@ export function GlassBox({
                                 closeBox(id);
                             }}
                             className="absolute top-0 right-1 w-11 h-6 font-bold border border-red-700 shadow-sm
-               bg-gradient-to-b from-red-600 via-red-700 to-red-600
-               hover:from-red-500 hover:via-red-600 hover:to-red-500
-               text-white flex items-center justify-center
-               rounded-br-sm transition-colors duration-200 ease-in-out
-               active:translate-y-[1px] active:shadow-inner glassy-button"
+                                bg-gradient-to-b from-red-600 via-red-700 to-red-600
+                                hover:from-red-500 hover:via-red-600 hover:to-red-500
+                                text-white flex items-center justify-center
+                                rounded-br-sm transition-colors duration-200 ease-in-out
+                                active:translate-y-[1px] active:shadow-inner glassy-button"
                         >
                             <span className="drop-shadow-[0_1px_1px_black]">✕</span>
                         </button>
                     </div>
 
-                    {/* content wrapper: respect disableDefaultWrapper and contentClassName */}
+                    {/* content wrapper */}
                     <div
                         className={`bg-white/20 text-black ${isSmallScreen ? '' : sizeClasses} 
-              ${appliedDisableDefaultWrapper ? '' : 'px-6 py-4'} 
-              ${appliedContentClassName} overflow-auto`}
+                            ${appliedDisableDefaultWrapper ? '' : 'px-6 py-4'} 
+                            ${appliedContentClassName} overflow-auto`}
                         onMouseDown={increaseZIndex}
                     >
                         {children}
