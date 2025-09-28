@@ -2,41 +2,37 @@
 import { templates } from './templates';
 
 export async function loadBoxes() {
-    const [imageData, textData] = await Promise.all([
-        fetch('/boxes-data/images.json').then((res) => res.json()),
-        fetch('/boxes-data/text.json').then((res) => res.json())
-    ]);
+    const res = await fetch('/.netlify/functions/boxes');
+    if (!res.ok) {
+        console.error('Failed to load boxes:', res.statusText);
+        return {};
+    }
+    const rows = await res.json();
 
     const registry = {};
 
-    // --- Template-driven boxes (text/article, image, etc.) ---
-    [...imageData, ...textData].forEach((box) => {
-        const Template = templates[box.template];
-        if (Template) {
-            registry[box.id] = async () => ({
-                // Defaults for all boxes
-                id: box.id,
-                template: box.template,
-                title: box.title || '',
-                heading: box.heading || null,
-                icon: box.icon || null,
-                iconW: box.iconW || 'w-5',
-                iconH: box.iconH || 'h-5',
-                headerColor: box.headerColor || null,
-                initialX: box.initialX ?? 100,
-                initialY: box.initialY ?? 100,
-                sizeClasses: box.sizeClasses || 'w-[400px] h-auto',
-                order: box.order || '',
-                contentClassName: box.contentClassName || '',
-                disableDefaultWrapper: box.disableDefaultWrapper || false,
+    rows.forEach((row) => {
+        const Template = templates[row.template];
+        if (!Template) return;
 
-                // Template reference
-                Template,
-
-                // Template-specific props (pass through whatever exists)
-                ...box
-            });
-        }
+        registry[row.id] = async () => ({
+            id: row.id,
+            template: row.template,
+            title: row.title ?? '',
+            heading: row.heading ?? null,
+            icon: row.icon ?? null,
+            iconW: row.icon_w ?? 'w-5',
+            iconH: row.icon_h ?? 'h-5',
+            headerColor: row.header_color ?? null,
+            initialX: row.initial_x ?? 100,
+            initialY: row.initial_y ?? 100,
+            sizeClasses: row.size_classes ?? 'w-[400px] h-auto',
+            order: row.sort_order ?? '',
+            contentClassName: row.content_class_name ?? '',
+            disableDefaultWrapper: row.disable_default_wrapper ?? false,
+            Template,
+            ...(row.data && typeof row.data === 'object' ? row.data : {})
+        });
     });
 
     return registry;

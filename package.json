@@ -10,6 +10,7 @@
     },
     "dependencies": {
         "@netlify/blobs": "^8.2.0",
+        "@supabase/supabase-js": "^2.58.0",
         "blobshape": "^1.0.0",
         "bright": "^0.8.5",
         "jquery": "^3.7.1",
