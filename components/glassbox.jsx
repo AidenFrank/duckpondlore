@@ -68,11 +68,11 @@ export function GlassBox({
 
     // Special z-index bump for help
     useEffect(() => {
-        if (id === 'help') {
+        if (boxState?.sourceId === 'help') {
             topZIndex += 1;
             setZIndex(topZIndex);
         }
-    }, [id]);
+    }, [boxState?.sourceId]);
 
     // Visibility animations (minimize / restore) — guarded so they don't fire
     // right after the initial 'pop' mount animation finishes.
@@ -95,6 +95,17 @@ export function GlassBox({
 
         prevVisibleRef.current = boxState.visible;
     }, [boxState?.visible, boxState?.hasRenderedOnce, shouldAnimate]);
+
+    function isValidCssBackground(value) {
+        if (typeof value !== 'string' || value.trim() === '') return false;
+
+        const el = document.createElement('div');
+        el.style.background = '';
+        el.style.background = value;
+
+        // If the browser doesn't accept it, style.background will be empty
+        return el.style.background !== '';
+    }
 
     // Small screen detection
     useEffect(() => {
@@ -238,9 +249,10 @@ export function GlassBox({
                         ${isSmallScreen ? `w-fit m-2 ${appliedOrder}` : ''}`}
                 >
                     <div
-                        className={`flex glass-header px-3 py-2 ${appliedHeaderColor || 'bg-linear-65 from-black to-white/5'} ${
-                            isDragging ? 'cursor-grabbing' : 'cursor-grab'
-                        }`}
+                        className={`flex glass-header px-3 py-2 ${isDragging ? 'cursor-grabbing' : 'cursor-grab'}`}
+                        style={{
+                            background: isValidCssBackground(appliedHeaderColor) ? appliedHeaderColor : '#1e40af'
+                        }}
                         onMouseDown={handleMouseDown}
                     >
                         {appliedIcon != null && (
