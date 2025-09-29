@@ -1,3 +1,5 @@
+// desktopicons/duckicon.js
+
 const DuckIcon = {
     id: 'duck',
     title: 'Duck',
@@ -6,17 +8,18 @@ const DuckIcon = {
     iconH: 'h-16',
     initialX: 200,
     initialY: 40,
+
+    // Glassbox definition (new style)
     glassbox: {
-        id: 'walkingduck',
-        title: 'QUACK',
-        src: '/gifs/walkingduck.gif',
-        alt: 'A duck walking',
-        icon: '/gifs/walkingduck.gif',
-        headerColor: 'bg-linear-65 from-orange-500 to-white/5',
-        initialX: 20,
-        initialY: 300,
-        sizeClasses: 'w-[200px] h-[200px]', // 👈 sets box size (outer)
-        imageClasses: 'w-full h-full object-contain' // 👈 fits inside with padding
+        sourceId: 'walkingduck',
+        overrides: {
+            title: 'QUACK',
+            headerColor: 'bg-linear-65 from-orange-500 to-white/5',
+            initialX: 20,
+            initialY: 300,
+            sizeClasses: 'w-[200px] h-[200px]',
+            contentClassName: 'flex items-center justify-center'
+        }
     }
 };
 

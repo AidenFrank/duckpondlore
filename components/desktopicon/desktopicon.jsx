@@ -17,7 +17,7 @@ export default function DesktopIcon({
     const clickCount = useRef(0);
     const clickTimer = useRef(null);
     const [isSmallScreen, setIsSmallScreen] = useState(false);
-    const { spawnBox } = useGlassBox();
+    const { openBox } = useGlassBox();
 
     useEffect(() => {
         const checkScreenSize = () => {
@@ -37,14 +37,17 @@ export default function DesktopIcon({
         } else if (clickCount.current === 2) {
             clearTimeout(clickTimer.current);
             clickCount.current = 0;
+
             if (link) {
                 window.open(link, '_blank');
             } else if (glassbox) {
                 if (typeof glassbox === 'string') {
-                    spawnBox(glassbox);
-                } else if (typeof glassbox === 'object' && glassbox.id) {
-                    const { id, ...options } = glassbox;
-                    spawnBox(id, options);
+                    // Simple case: just open by sourceId
+                    openBox(glassbox);
+                } else if (typeof glassbox === 'object') {
+                    // New case: { sourceId, overrides }
+                    const { sourceId, overrides = {} } = glassbox;
+                    openBox(sourceId, overrides);
                 }
             }
         }
@@ -65,8 +68,7 @@ export default function DesktopIcon({
                       }
             }
         >
-            {/* Fixed-size container */}
-            <div className="w-20 h-20 flex items-center justify-center overflow-hidden ">
+            <div className="w-20 h-20 flex items-center justify-center overflow-hidden">
                 <img
                     src={icon}
                     alt={title}
@@ -74,12 +76,7 @@ export default function DesktopIcon({
                     draggable={false}
                 />
             </div>
-            <span
-                className="text-xs text-white mt-1"
-                style={{
-                    textShadow: '1px 1px 2px black'
-                }}
-            >
+            <span className="text-xs text-white mt-1" style={{ textShadow: '1px 1px 2px black' }}>
                 {title}
             </span>
         </div>

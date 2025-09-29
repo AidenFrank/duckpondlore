@@ -14,30 +14,42 @@ export default function GlassBoxManager() {
     useEffect(() => {
         const loadAndMerge = async () => {
             try {
-                //console.log('[GlassBoxManager] Loading registry...');
                 const registry = await loadBoxes();
 
                 const merged = await Promise.all(
                     boxInstances.map(async (inst) => {
-                        const loader = registry[inst.id];
+                        const sourceKey = inst.sourceId ?? inst.type ?? inst.id;
+                        const loader = registry[sourceKey];
+
                         if (!loader) {
-                            console.warn(`[GlassBoxManager] No loader found for "${inst.id}"`);
+                            console.warn(
+                                `[GlassBoxManager] No loader found for "${sourceKey}" (instance: "${inst.id}")`
+                            );
                             return inst;
                         }
+
                         try {
-                            const cfg = await loader();
-                            //console.log(`[GlassBoxManager] Loaded config for "${cfg.id}" from Supabase`);
-                            return { ...cfg, ...inst }; // instance overrides registry
+                            const cfg = await loader(); // canonical config
+                            const overrides = inst.overrides || {};
+                            const mergedConfig = {
+                                ...cfg,
+                                ...overrides,
+                                ...inst, // includes id (instance id) and sourceId
+                                sourceId: cfg.id ?? inst.sourceId
+                            };
+
+                            return mergedConfig;
                         } catch (err) {
-                            console.error(`[GlassBoxManager] Error loading config for ${inst.id}:`, err);
+                            console.error(`[GlassBoxManager] Error loading config for ${sourceKey}:`, err);
                             return inst;
                         }
                     })
                 );
 
                 merged.forEach((config) => registerBox(config.id, config));
+
                 setBoxConfigs(merged);
-                setError(null); // reset error on success
+                setError(null);
             } catch (err) {
                 console.error('[GlassBoxManager] Failed to load registry:', err);
                 setError(err.message || 'Unknown error');

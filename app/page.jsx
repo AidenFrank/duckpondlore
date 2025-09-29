@@ -10,13 +10,13 @@ export default function Page() {
     return (
         <GlassBoxProvider
             initialBoxInstances={[
-                { id: 'about', type: 'about' },
-                { id: 'help', type: 'help' },
-                { id: 'frutigeraero1', type: 'frutigeraero1' },
-                { id: 'walkingduck', type: 'walkingduck' },
-                { id: 'butterdog', type: 'butterdog' },
-                { id: 'mikudance', type: 'mikudance' },
-                { id: 'mikuweb', type: 'mikuweb' }
+                { sourceId: 'about' },
+                { sourceId: 'help' },
+                { sourceId: 'frutigeraero1' },
+                { sourceId: 'walkingduck' },
+                { sourceId: 'butterdog' },
+                { sourceId: 'mikudance' },
+                { sourceId: 'mikuweb' }
             ]}
         >
             <div className="relative w-screen h-screen overflow-x-hidden">
