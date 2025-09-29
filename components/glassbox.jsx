@@ -296,3 +296,5 @@ export function GlassBox({
         </>
     );
 }
+
+export default GlassBox;

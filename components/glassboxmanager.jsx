@@ -5,52 +5,62 @@ import { useEffect, useState } from 'react';
 import { GlassBox } from './glassbox';
 import { loadBoxes } from '../boxes/registry.jsx';
 import { useGlassBox } from '../context/glassboxcontext';
-import { templates } from '../boxes/templates';
 
 export default function GlassBoxManager() {
     const { boxes, registerBox, boxInstances } = useGlassBox();
     const [boxConfigs, setBoxConfigs] = useState([]);
+    const [error, setError] = useState(null);
 
     useEffect(() => {
         const loadAndMerge = async () => {
-            const registry = await loadBoxes(); // fetches/constructs loaders from JSON
-            // For each instance, call the proper registry loader (if one exists)
-            const merged = await Promise.all(
-                boxInstances.map(async (inst) => {
-                    const loader = registry[inst.type];
-                    if (!loader) {
-                        // no registry entry found for this type -> just use the instance as-is
-                        return inst;
-                    }
-                    try {
-                        const cfg = await loader(); // cfg is the config object returned by the loader
-                        // merge registry config -> instance overrides (instance overrides registry)
-                        return {
-                            ...cfg,
-                            ...inst
-                        };
-                    } catch (err) {
-                        console.error('Error loading box template/config for', inst.type, err);
-                        return inst;
-                    }
-                })
-            );
+            try {
+                //console.log('[GlassBoxManager] Loading registry...');
+                const registry = await loadBoxes();
 
-            // register each config (context will extract style keys)
-            merged.forEach((config) => registerBox(config.id, config));
-            setBoxConfigs(merged);
+                const merged = await Promise.all(
+                    boxInstances.map(async (inst) => {
+                        const loader = registry[inst.id];
+                        if (!loader) {
+                            console.warn(`[GlassBoxManager] No loader found for "${inst.id}"`);
+                            return inst;
+                        }
+                        try {
+                            const cfg = await loader();
+                            //console.log(`[GlassBoxManager] Loaded config for "${cfg.id}" from Supabase`);
+                            return { ...cfg, ...inst }; // instance overrides registry
+                        } catch (err) {
+                            console.error(`[GlassBoxManager] Error loading config for ${inst.id}:`, err);
+                            return inst;
+                        }
+                    })
+                );
+
+                merged.forEach((config) => registerBox(config.id, config));
+                setBoxConfigs(merged);
+                setError(null); // reset error on success
+            } catch (err) {
+                console.error('[GlassBoxManager] Failed to load registry:', err);
+                setError(err.message || 'Unknown error');
+            }
         };
 
         loadAndMerge();
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [boxInstances]);
 
+    if (error) {
+        return (
+            <div className="p-4 text-red-500 bg-red-100 border border-red-300 rounded">
+                <strong>Error loading boxes:</strong> {error}
+            </div>
+        );
+    }
+
     return (
         <>
             {boxConfigs.map((box) => {
                 if (!boxes[box.id]) return null;
 
-                // If it's template-driven, render the Template component with data props
                 const contentElement = box.Template ? (
                     <box.Template {...box} />
                 ) : box.Wrapper ? (
