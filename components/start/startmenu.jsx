@@ -91,6 +91,20 @@ export default function StartMenu({ isOpen, onClose, fetchUrl = '/.netlify/funct
         });
     }
 
+    // Results in search mode (must be defined BEFORE flatItems)
+    const results = useMemo(() => {
+        const q = query.trim().toLowerCase();
+        if (!q) return [];
+        return catalog
+            .filter((row) => {
+                const title = (row.title || '').toString().toLowerCase();
+                const tags = (row.tags || []).map((t) => t.toLowerCase());
+                const isHidden = (row.tags || []).includes('hidden');
+                return !isHidden && (title.includes(q) || tags.some((t) => t.includes(q)));
+            })
+            .slice(0, 10);
+    }, [query, catalog]);
+
     // Flat list builder for navigation
     const flatItems = useMemo(() => {
         if (query) {
@@ -104,21 +118,7 @@ export default function StartMenu({ isOpen, onClose, fetchUrl = '/.netlify/funct
             items.push({ key: `recents-${i}`, row });
         });
         return items;
-    }, [query, suggested, recents]);
-
-    // Results in search mode
-    const results = useMemo(() => {
-        const q = query.trim().toLowerCase();
-        if (!q) return [];
-        return catalog
-            .filter((row) => {
-                const title = (row.title || '').toString().toLowerCase();
-                const tags = (row.tags || []).map((t) => t.toLowerCase());
-                const isHidden = (row.tags || []).includes('hidden');
-                return !isHidden && (title.includes(q) || tags.some((t) => t.includes(q)));
-            })
-            .slice(0, 10);
-    }, [query, catalog]);
+    }, [query, results, suggested, recents]);
 
     function spawnRow(row) {
         if (!row) return;
