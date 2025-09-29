@@ -1,24 +1,21 @@
+// components/footer.jsx
 'use client';
 
 import { useEffect, useState } from 'react';
 import { useGlassBox } from 'context/glassboxcontext';
 import StartButton from 'components/start/startbutton';
+import StartMenu from 'components/start/startmenu';
+
+// 👇 import the shared utils
+import { getFirstGrapheme, isEmoji } from '/lib/iconUtils.js';
 
 export default function Footer() {
     const { boxes, boxInstances, toggleVisibility } = useGlassBox();
     const [orderedBoxes, setOrderedBoxes] = useState([]);
     const [draggedId, setDraggedId] = useState(null);
 
-    const getFirstGrapheme = (str, fallback = '?') => {
-        if (!str) return fallback;
-        return Array.from(str)[0] || fallback;
-    };
-
-    const isEmoji = (char) => {
-        if (!char) return false;
-        const code = char.codePointAt(0);
-        return code >= 0x1f300 && code <= 0x1faff;
-    };
+    // State for StartMenu
+    const [isStartMenuOpen, setIsStartMenuOpen] = useState(false);
 
     useEffect(() => {
         setOrderedBoxes(boxInstances);
@@ -29,7 +26,7 @@ export default function Footer() {
             {/* Start Button Area */}
             <div className="flex items-center">
                 <div className="h-15 w-15">
-                    <StartButton />
+                    <StartButton toggleMenu={() => setIsStartMenuOpen((prev) => !prev)} isActive={isStartMenuOpen} />
                 </div>
             </div>
 
@@ -47,7 +44,6 @@ export default function Footer() {
 
                         if (!fallbackLetter) {
                             const idFirst = getFirstGrapheme(id);
-                            // if ID starts with emoji, keep it — otherwise use its first letter
                             fallbackLetter = isEmoji(idFirst) ? idFirst : idFirst.toUpperCase();
                         }
 
@@ -102,6 +98,9 @@ export default function Footer() {
                     })}
                 </div>
             </div>
+
+            {/* Start Menu */}
+            <StartMenu isOpen={isStartMenuOpen} onClose={() => setIsStartMenuOpen(false)} />
         </footer>
     );
 }
