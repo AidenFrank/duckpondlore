@@ -3,16 +3,7 @@ import Script from 'next/script';
 import RippleInit from '../components/rippleinit';
 import WaterBackground from '../components/waterbackground';
 
-const waterBackgrounds = ['/images/water1.jpg', '/images/water2.jpg', '/images/water3.jpg'];
-
-const getRandomBackground = () => {
-    const randomIndex = Math.floor(Math.random() * waterBackgrounds.length);
-    return waterBackgrounds[randomIndex];
-};
-
 export default function RootLayout({ children }) {
-    const imageURL = getRandomBackground();
-
     return (
         <html lang="en">
             <head>

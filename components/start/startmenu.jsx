@@ -271,7 +271,7 @@ export default function StartMenu({ isOpen, onClose, fetchUrl = '/.netlify/funct
                                 setQuery(e.target.value);
                                 setHighlight(null);
                             }}
-                            placeholder="Search programs and files"
+                            placeholder="Search"
                             className="w-full px-3 py-2 rounded-md border border-gray-300 text-sm
                                 focus:outline-none focus:ring-2 focus:ring-blue-400"
                         />

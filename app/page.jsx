@@ -48,8 +48,6 @@ export default function Page() {
                 { sourceId: 'help' },
                 { sourceId: 'frutigeraero1' },
                 { sourceId: 'walkingduck' },
-                { sourceId: 'butterdog' },
-                { sourceId: 'mikudance' },
                 { sourceId: 'mikuweb' }
             ]}
         >
