@@ -34,16 +34,16 @@ export default function SlopstreakReader({ initialArticleSlug = null }) {
 
     useEffect(() => {
         async function loadList() {
-            const { data, error } = await supabase
-                .from('slopstreak_articles')
-                .select('id,slug,title,author')
-                .order('created_at', { ascending: false });
-            if (error) {
-                console.error(error);
-                return;
-            }
-            setArticles(data || []);
+        const { data, error } = await supabase
+            .from('slopstreak_articles')
+            .select('id,slug,title,author,tags') // ⬅ make sure tags are fetched too
+            .order('created_at', { ascending: false });
+        if (error) {
+            console.error(error);
+            return;
         }
+        setArticles(data || []);
+    }
         loadList();
     }, []);
 
@@ -74,49 +74,82 @@ export default function SlopstreakReader({ initialArticleSlug = null }) {
     }, [selectedSlug]);
 
     const filtered = useMemo(() => {
-        if (!query) return articles;
-        const q = query.toLowerCase();
-        return articles.filter(
-            (a) =>
-                a.title.toLowerCase().includes(q) ||
-                (a.author && a.author.toLowerCase().includes(q)) ||
-                (a.slug && a.slug.toLowerCase().includes(q))
-        );
-    }, [articles, query]);
+    if (!query) {
+        // no search → show 20 random articles only
+        if (articles.length <= 20) return articles;
+        const shuffled = [...articles].sort(() => Math.random() - 0.5);
+        return shuffled.slice(0, 20);
+    }
+
+    const q = query.toLowerCase();
+    return articles.filter((a) =>
+        (a.title && a.title.toLowerCase().includes(q)) ||
+        (a.author && a.author.toLowerCase().includes(q)) ||
+        (a.slug && a.slug.toLowerCase().includes(q)) ||
+        (a.tags && a.tags.some((tag) => tag.toLowerCase().includes(q))) // ⬅ check tags
+    );
+}, [articles, query]);
 
     // Custom renderers to mimic Discord-like style
-    const components = {
-        img: ({ node, ...props }) => <img {...props} loading="lazy" className="max-w-full h-auto rounded-md my-2" />,
-        a: ({ node, ...props }) => (
-            <a {...props} className="text-blue-400 hover:underline" target="_blank" rel="noreferrer" />
-        ),
-        blockquote: ({ node, ...props }) => (
-            <blockquote {...props} className="border-l-4 border-gray-600 pl-3 text-gray-300 italic my-2" />
-        ),
-        code: ({ inline, className, children, ...props }) => {
-            return inline ? (
-                <code className="bg-[#1e1f22] px-1.5 py-0.5 rounded text-pink-300 text-sm">{children}</code>
-            ) : (
-                <pre className="bg-[#1e1f22] p-3 rounded overflow-x-auto text-sm text-gray-100">
-                    <code>{children}</code>
-                </pre>
-            );
-        },
-        p: ({ node, ...props }) => <p {...props} className="my-2 leading-relaxed" />,
-        span: ({ node, ...props }) => {
-            if (props.className === 'spoiler') {
-                return (
-                    <span
-                        {...props}
-                        className="spoiler bg-[#1e1f22] text-transparent rounded px-1 hover:text-[#dcddde]"
-                    />
-                );
-            }
-            return <span {...props} />;
-        },
-        ul: ({ node, ...props }) => <ul {...props} className="list-disc list-inside my-2" />,
-        ol: ({ node, ...props }) => <ol {...props} className="list-decimal list-inside my-2" />
-    };
+    // replace the old `const components = { ... }` with this
+const components = {
+  img: ({ node, ...props }) => (
+    <img {...props} loading="lazy" className="max-w-full h-auto rounded-md my-2" />
+  ),
+
+  a: ({ node, ...props }) => (
+    <a {...props} className="text-blue-400 hover:underline" target="_blank" rel="noreferrer" />
+  ),
+
+  blockquote: ({ node, ...props }) => (
+    <blockquote {...props} className="border-l-4 border-gray-600 pl-3 text-gray-300 italic my-2" />
+  ),
+
+  code: ({ inline, className, children, ...props }) => {
+    return inline ? (
+      <code className="bg-[#1e1f22] px-1.5 py-0.5 rounded text-pink-300 text-sm">{children}</code>
+    ) : (
+      <pre className="bg-[#1e1f22] p-3 rounded overflow-x-auto text-sm text-gray-100">
+        <code {...props}>{children}</code>
+      </pre>
+    );
+  },
+
+  // NEW: robust paragraph renderer that lays out consecutive images in a row.
+  p: ({ node, children, ...props }) => {
+    // Detect if this paragraph is just images (possibly with whitespace)
+    const onlyImages =
+        node.children &&
+        node.children.length > 0 &&
+        node.children.every(
+            (child) =>
+                child.tagName === 'img' ||
+                (child.type === 'text' && child.value.trim() === '')
+        );
+
+    if (onlyImages) {
+        return (
+            <div className="flex flex-wrap gap-2 my-2 justify-start">
+                {children}
+            </div>
+        );
+    }
+
+    return (
+        <p {...props} className="my-2 leading-relaxed">
+            {children}
+        </p>
+    );
+},
+
+
+
+  p_small: ({ node, ...props }) => <p {...props} className="my-2 leading-relaxed" />, // unused fallback
+
+  ul: ({ node, ...props }) => <ul {...props} className="list-disc list-inside my-2" />,
+  ol: ({ node, ...props }) => <ol {...props} className="list-decimal list-inside my-2" />,
+};
+
 
     return (
         <div className="w-[900px] h-[600px] max-w-[95vw] max-h-[90vh] flex flex-col bg-[#2b2d31] text-[#dcddde] font-sans p-3">
@@ -156,14 +189,15 @@ export default function SlopstreakReader({ initialArticleSlug = null }) {
                     {article && (
                         <div className="flex flex-col gap-4">
                             {article.header_image && (
-                                <div className="w-full h-48 overflow-hidden rounded-md">
-                                    <img
-                                        src={article.header_image}
-                                        alt="Header"
-                                        className="object-cover w-full h-full"
-                                    />
-                                </div>
-                            )}
+    <div className="w-full overflow-hidden rounded-md bg-black flex justify-center">
+        <img
+            src={article.header_image}
+            alt="Header"
+            className="object-contain max-h-96 w-full h-auto"
+        />
+    </div>
+)}
+
                             <div className="flex items-center gap-3">
                                 <img
                                     src={article.profile_picture || DEFAULT_PFP_URL}
@@ -176,12 +210,13 @@ export default function SlopstreakReader({ initialArticleSlug = null }) {
                                 </div>
                             </div>
                             <ReactMarkdown
-                                remarkPlugins={[remarkGfm]}
-                                rehypePlugins={[rehypeRaw, rehypeSanitize]}
-                                components={components}
-                            >
-                                {preprocessMarkdown(article.markdown)}
-                            </ReactMarkdown>
+    remarkPlugins={[remarkGfm]}
+    rehypePlugins={[rehypeRaw, rehypeSanitize]}
+    components={components}
+>
+    {preprocessMarkdown(article?.markdown || '')}
+</ReactMarkdown>
+
                         </div>
                     )}
                 </div>
