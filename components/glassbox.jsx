@@ -296,9 +296,7 @@ export function GlassBox({
 
                     {/* content wrapper */}
                     <div
-                        className={`bg-white/20 text-black ${isSmallScreen ? '' : sizeClasses} 
-                            ${appliedDisableDefaultWrapper ? '' : 'px-6 py-4'} 
-                            ${appliedContentClassName} overflow-auto`}
+                        className={`bg-white/20 text-black ${isSmallScreen ? 'w-full max-w-full overflow-x-hidden' : sizeClasses} ${appliedDisableDefaultWrapper ? '' : 'px-6 py-4'} ${appliedContentClassName} overflow-y-auto`}
                         onMouseDown={increaseZIndex}
                     >
                         {children}
