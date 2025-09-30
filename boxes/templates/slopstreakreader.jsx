@@ -124,7 +124,7 @@ export default function SlopstreakReader({ initialArticleSlug = null }) {
             <div className="flex items-center p-3 border-b border-[#1e1f22] bg-[#313338] rounded">
                 <input
                     className="flex-1 px-3 py-2 rounded bg-[#1e1f22] text-[#dcddde] placeholder-gray-400 focus:outline-none"
-                    placeholder="Search articles by title, author, or slug..."
+                    placeholder="Search articles by title or author..."
                     value={query}
                     onChange={(e) => setQuery(e.target.value)}
                 />
