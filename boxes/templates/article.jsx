@@ -24,7 +24,8 @@ export default function ArticleTemplate({
     imageUrl,
     paragraphs = [],
     imageClasses = 'w-30 h-30 object-contain',
-    headingClasses = 'text-2xl md:text-4xl font-extrabold'
+    headingClasses = 'text-2xl md:text-4xl font-extrabold',
+    paragraphAlign = 'text-justify'
 }) {
     return (
         <div className={`flex flex-col gap-4 ${contentClassName}`}>
@@ -47,7 +48,7 @@ export default function ArticleTemplate({
             {/* Bottom row: paragraphs */}
             {paragraphs.length > 0 && (
                 <div className="flex items-center justify-center">
-                    <div className="text-center gap-2 w-fit min-w-[250px]">
+                    <div className={`gap-2 w-fit min-w-[250px] ${paragraphAlign}`}>
                         {paragraphs.map((p, i) => (
                             <p key={i}>{p}</p>
                         ))}

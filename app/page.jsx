@@ -48,7 +48,8 @@ export default function Page() {
                 { sourceId: 'help' },
                 { sourceId: 'frutigeraero1' },
                 { sourceId: 'walkingduck' },
-                { sourceId: 'mikuweb' }
+                { sourceId: 'mikuweb' },
+                { sourceId: 'slopstreakreader' }
             ]}
         >
             <div className="relative w-screen h-screen overflow-x-hidden">
