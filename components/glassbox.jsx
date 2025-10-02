@@ -27,6 +27,7 @@ export function GlassBox({
     const [hasMounted, setHasMounted] = useState(false);
     const [shouldAnimate, setShouldAnimate] = useState(true);
     const [hasPlayedPop, setHasPlayedPop] = useState(false);
+    const [isMaximized, setIsMaximized] = useState(false);
     const { boxes, toggleVisibility, updateBox, closeBox } = useGlassBox();
     const dragOffset = useRef({ x: 0, y: 0 });
     const boxRef = useRef(null);
@@ -263,35 +264,57 @@ export function GlassBox({
                             />
                         )}
                         <h3 className="text-sm font-semibold text-white">{title}</h3>
-                        <button
-                            onClick={(e) => {
-                                e.stopPropagation();
-                                toggleVisibility(id);
-                            }}
-                            className="absolute top-0 right-[45px] w-8 h-6 font-bold border border-white/30 shadow-sm
-                                bg-gradient-to-b from-white/20 via-white/30 to-white/20
-                                hover:from-white/30 hover:via-white/40 hover:to-white/30
-                                text-white flex items-center justify-center rounded-b-sm
-                                transition-colors duration-200 ease-in-out
-                                active:translate-y-[1px] active:shadow-inner glassy-button"
-                        >
-                            <span className="drop-shadow-[0_1px_1px_white]">—</span>
-                        </button>
+                        <div className="absolute top-0 right-1 flex h-6">
+                            {/* Minimize */}
+                            <button
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    toggleVisibility(id);
+                                }}
+                                className="w-8 h-full font-bold border border-white/30 border-r-0 shadow-sm
+      bg-gradient-to-b from-white/20 via-white/30 to-white/20
+      hover:from-white/30 hover:via-white/40 hover:to-white/30
+      text-white flex items-center justify-center leading-none
+      rounded-none transition-colors duration-200 ease-in-out
+      active:translate-y-[1px] active:shadow-inner glassy-button"
+                            >
+                                <span className="drop-shadow-[0_1px_1px_white] translate-y-[-1px]">—</span>
+                            </button>
 
-                        <button
-                            onClick={(e) => {
-                                e.stopPropagation();
-                                closeBox(id);
-                            }}
-                            className="absolute top-0 right-1 w-11 h-6 font-bold border border-red-700 shadow-sm
-                                bg-gradient-to-b from-red-600 via-red-700 to-red-600
-                                hover:from-red-500 hover:via-red-600 hover:to-red-500
-                                text-white flex items-center justify-center
-                                rounded-br-sm transition-colors duration-200 ease-in-out
-                                active:translate-y-[1px] active:shadow-inner glassy-button"
-                        >
-                            <span className="drop-shadow-[0_1px_1px_black]">✕</span>
-                        </button>
+                            {/* Maximize */}
+                            <button
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    setIsMaximized((prev) => !prev);
+                                }}
+                                className="w-8 h-full font-bold border border-white/30 border-r-0 shadow-sm
+      bg-gradient-to-b from-white/20 via-white/30 to-white/20
+      hover:from-white/30 hover:via-white/40 hover:to-white/30
+      text-white flex items-center justify-center leading-none
+      rounded-none transition-colors duration-200 ease-in-out
+      active:translate-y-[1px] active:shadow-inner glassy-button"
+                            >
+                                <span className="drop-shadow-[0_1px_1px_white] translate-y-[-1px]">
+                                    {isMaximized ? '🗗' : '🗖'}
+                                </span>
+                            </button>
+
+                            {/* Close */}
+                            <button
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    closeBox(id);
+                                }}
+                                className="w-11 h-full font-bold border border-red-700 shadow-sm
+      bg-gradient-to-b from-red-600 via-red-700 to-red-600
+      hover:from-red-500 hover:via-red-600 hover:to-red-500
+      text-white flex items-center justify-center
+      rounded-br-sm transition-colors duration-200 ease-in-out
+      active:translate-y-[1px] active:shadow-inner glassy-button"
+                            >
+                                <span className="drop-shadow-[0_1px_1px_black] translate-y-[-1px]">✕</span>
+                            </button>
+                        </div>
                     </div>
 
                     {/* content wrapper */}
